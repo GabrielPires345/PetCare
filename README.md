@@ -12,7 +12,7 @@ Este projeto foi desenhado para servir como uma plataforma completa para o ecoss
 ---
 
 ## 📋 Critérios de Aceite (Sprint 1)
-**Período (TimeBox):** 10/04 - 17/04
+**Período (TimeBox):** 10/04/2026 - 17/04/2026
 
 ### 1. Landing Page
 * **Responsividade:** O layout deve ser perfeitamente adaptável a diferentes tamanhos de tela (Mobile, Tablet e Desktop).
@@ -49,7 +49,159 @@ Este projeto foi desenhado para servir como uma plataforma completa para o ecoss
   * Campo de Observações (Obs) para notas adicionais.
 
 ---
+## Diagrama DB
 
+```mermaid
+erDiagram
+    USUARIO ||--|| CLIENTE : perfil_cliente
+    USUARIO ||--|| VETERINARIO : perfil_vet
+    USUARIO ||--|| CLINICA : perfil_clinica
+    
+    CLIENTE ||--o{ PET : possui
+
+    CLIENTE ||--o{ ENDERECO_CLIENTE : cadastra
+    CLIENTE ||--o{ TELEFONE_CLIENTE : cadastra
+
+    CLINICA ||--o{ ENDERECO_CLINICA : localizada_em
+    CLINICA ||--o{ TELEFONE_CLINICA : contato
+
+    CLINICA ||--o{ CLINICA_VETERINARIO : possui_corpo_clinico
+    VETERINARIO ||--o{ CLINICA_VETERINARIO : atende_em
+    
+    PET ||--o{ AGENDAMENTO : recebe_atendimento
+    CLINICA ||--o{ AGENDAMENTO : sedia
+    VETERINARIO ||--o{ AGENDAMENTO : realiza
+    SERVICO ||--o{ AGENDAMENTO : define_tipo
+    
+    AGENDAMENTO ||--o{ HISTORICO_STATUS : gera_logs
+    USUARIO ||--o{ HISTORICO_STATUS : altera_status
+
+    USUARIO {
+        UUID id_usuario PK
+        STRING email
+        STRING password_hash
+        STRING nivel_acesso
+        DATETIME created_at
+        DATETIME updated_at
+        DATETIME deleted_at
+    }
+
+    CLIENTE {
+        UUID id_cliente PK
+        UUID usuario_id FK
+        STRING nome_completo
+        STRING cpf
+        DATE data_nascimento
+    }
+
+    VETERINARIO {
+        UUID id_veterinario PK
+        UUID usuario_id FK
+        STRING nome
+        STRING crmv
+        STRING especialidade
+    }
+
+    CLINICA {
+        UUID id_clinica PK
+        UUID usuario_id FK
+        STRING nome_fantasia
+        STRING razao_social
+        STRING cnpj
+    }
+
+    CLINICA_VETERINARIO {
+        UUID clinica_id FK
+        UUID veterinario_id FK
+    }
+
+    PET {
+        UUID id_pet PK
+        UUID cliente_id FK
+        STRING nome
+        STRING especie
+        STRING sexo
+        DECIMAL peso_atual
+        DATE data_nascimento
+        BOOLEAN is_castrado
+        DATETIME created_at
+        DATETIME updated_at
+        DATETIME deleted_at
+    }
+
+    AGENDAMENTO {
+        UUID id_agendamento PK
+        UUID pet_id FK
+        UUID clinica_id FK
+        UUID veterinario_id FK
+        UUID servico_id FK
+        DATETIME data_hora_marcada
+        STRING status
+        DECIMAL valor_final
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    SERVICO {
+        UUID id_servico PK
+        STRING nome
+        STRING descricao
+        DECIMAL preco_base
+        INT duracao_minutos
+    }
+
+    ENDERECO_CLIENTE {
+        UUID id_endereco PK
+        UUID cliente_id FK
+        STRING logradouro
+        STRING numero
+        STRING bairro
+        STRING cidade
+        STRING uf
+        STRING cep
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    ENDERECO_CLINICA {
+        UUID id_endereco PK
+        UUID clinica_id FK
+        STRING logradouro
+        STRING numero
+        STRING bairro
+        STRING cidade
+        STRING uf
+        STRING cep
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    TELEFONE_CLIENTE {
+        UUID id_telefone PK
+        UUID cliente_id FK
+        STRING ddd
+        STRING numero
+        BOOLEAN is_whatsapp
+    }
+
+    TELEFONE_CLINICA {
+        UUID id_telefone PK
+        UUID clinica_id FK
+        STRING ddd
+        STRING numero
+        BOOLEAN is_whatsapp
+    }
+
+    HISTORICO_STATUS {
+        UUID id PK
+        UUID agendamento_id FK
+        STRING status_anterior
+        STRING status_novo
+        UUID usuario_responsavel_id FK
+        DATETIME created_at
+    }
+```
+---
 ## 🔌 Formato de Resposta API
 
 Sucesso (Ex: 201 Created):
