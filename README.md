@@ -58,15 +58,16 @@ erDiagram
     USUARIO ||--|| CLINICA : perfil_clinica
     
     CLIENTE ||--o{ PET : possui
+    CLIENTE ||--o{ ENDERECO : possui
+    CLIENTE ||--o{ TELEFONE : possui
 
-    CLIENTE ||--o{ ENDERECO_CLIENTE : cadastra
-    CLIENTE ||--o{ TELEFONE_CLIENTE : cadastra
-
-    CLINICA ||--o{ ENDERECO_CLINICA : localizada_em
-    CLINICA ||--o{ TELEFONE_CLINICA : contato
+    CLINICA ||--o{ ENDERECO : possui
+    CLINICA ||--o{ TELEFONE : possui
 
     CLINICA ||--o{ CLINICA_VETERINARIO : possui_corpo_clinico
     VETERINARIO ||--o{ CLINICA_VETERINARIO : atende_em
+    
+    VETERINARIO }o--o{ ESPECIALIDADE : possui
     
     PET ||--o{ AGENDAMENTO : recebe_atendimento
     CLINICA ||--o{ AGENDAMENTO : sedia
@@ -83,7 +84,6 @@ erDiagram
         STRING nivel_acesso
         DATETIME created_at
         DATETIME updated_at
-        DATETIME deleted_at
     }
 
     CLIENTE {
@@ -99,7 +99,11 @@ erDiagram
         UUID usuario_id FK
         STRING nome
         STRING crmv
-        STRING especialidade
+    }
+
+    ESPECIALIDADE {
+        UUID id_especialidade PK
+        STRING nome
     }
 
     CLINICA {
@@ -110,9 +114,25 @@ erDiagram
         STRING cnpj
     }
 
-    CLINICA_VETERINARIO {
-        UUID clinica_id FK
-        UUID veterinario_id FK
+    ENDERECO {
+        UUID id_endereco PK
+        UUID cliente_id FK "nullable"
+        UUID clinica_id FK "nullable"
+        STRING logradouro
+        STRING numero
+        STRING bairro
+        STRING cidade
+        STRING uf
+        STRING cep
+    }
+
+    TELEFONE {
+        UUID id_telefone PK
+        UUID cliente_id FK "nullable"
+        UUID clinica_id FK "nullable"
+        STRING ddd
+        STRING numero
+        BOOLEAN is_whatsapp
     }
 
     PET {
@@ -124,9 +144,6 @@ erDiagram
         DECIMAL peso_atual
         DATE data_nascimento
         BOOLEAN is_castrado
-        DATETIME created_at
-        DATETIME updated_at
-        DATETIME deleted_at
     }
 
     AGENDAMENTO {
@@ -138,8 +155,6 @@ erDiagram
         DATETIME data_hora_marcada
         STRING status
         DECIMAL valor_final
-        DATETIME created_at
-        DATETIME updated_at
     }
 
     SERVICO {
@@ -148,48 +163,6 @@ erDiagram
         STRING descricao
         DECIMAL preco_base
         INT duracao_minutos
-    }
-
-    ENDERECO_CLIENTE {
-        UUID id_endereco PK
-        UUID cliente_id FK
-        STRING logradouro
-        STRING numero
-        STRING bairro
-        STRING cidade
-        STRING uf
-        STRING cep
-        DATETIME created_at
-        DATETIME updated_at
-    }
-
-    ENDERECO_CLINICA {
-        UUID id_endereco PK
-        UUID clinica_id FK
-        STRING logradouro
-        STRING numero
-        STRING bairro
-        STRING cidade
-        STRING uf
-        STRING cep
-        DATETIME created_at
-        DATETIME updated_at
-    }
-
-    TELEFONE_CLIENTE {
-        UUID id_telefone PK
-        UUID cliente_id FK
-        STRING ddd
-        STRING numero
-        BOOLEAN is_whatsapp
-    }
-
-    TELEFONE_CLINICA {
-        UUID id_telefone PK
-        UUID clinica_id FK
-        STRING ddd
-        STRING numero
-        BOOLEAN is_whatsapp
     }
 
     HISTORICO_STATUS {
