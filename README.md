@@ -84,6 +84,7 @@ erDiagram
         STRING nivel_acesso
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 
     CLIENTE {
@@ -99,6 +100,12 @@ erDiagram
         UUID usuario_id FK
         STRING nome
         STRING crmv
+    }
+
+    CLINICA_VETERINARIO {
+        UUID clinica_id FK
+        UUID veterinario_id FK
+        DATETIME data_vinculo
     }
 
     ESPECIALIDADE {
@@ -144,6 +151,7 @@ erDiagram
         DECIMAL peso_atual
         DATE data_nascimento
         BOOLEAN is_castrado
+        DATETIME deleted_at
     }
 
     AGENDAMENTO {
