@@ -49,7 +49,7 @@ Este projeto foi desenhado para servir como uma plataforma completa para o ecoss
   * Campo de Observações (Obs) para notas adicionais.
 
 ---
-## Diagrama DB
+## Diagrama DB.
 
 ```mermaid
 erDiagram
