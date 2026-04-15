@@ -2,45 +2,33 @@
 
 {% block title %}PetCare – Cuidado completo para seu Pet{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/home.css') }}">
+{% endblock %}
 
 {% block body %}
-    <head>
-        <link rel="stylesheet" href="{{ asset('styles/LandigPage.css') }}">
-    </head>
+    <main>
+        <section class="hero py-5">
+            <div class="container-fluid px-4 px-lg-5">
+                <div class="hero-content">
 
-    <header>
-        <a class="logo">
-            <span style="font-size:2rem;line-height:1;">🐾</span>
-            <span class="logo-wordmark">Pet<span>Care</span></span>
-        </a>
-        <nav></nav>
-        <div style="display:flex;align-items:center;gap:20px;">
-            <a href="#" class="btn-ghost">Entrar</a>
-            <a href="#" class="btn-primary">Baixar App</a>
-        </div>
-    </header>
+                    <div class="hero-badge d-inline-flex align-items-center mb-3">
+                        <span class="dot"></span>
+                        <span class="ms-2">Plataforma completa para tutores</span>
+                    </div>
 
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span class="dot"></span> Plataforma completa para tutores
+                    <h1 class="fw-bold mb-4">
+                        Tudo que seu pet precisa,<br>
+                        na palma da <span class="accent">sua mão.</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        Saúde, socialização e mercado em um único ecossistema.
+                        Controle vacinas, consultas e gastos — de forma inteligente e simples.
+                    </p>
+
+                </div>
             </div>
-
-            <h1>
-                Tudo que seu pet precisa,<br>
-                na palma da <span class="accent">sua mão.</span>
-            </h1>
-
-            <p>
-                Saúde, socialização e mercado em um único ecossistema.
-                Controle vacinas, consultas e gastos — de forma inteligente e simples.
-            </p>
-
-            <div class="hero-actions">
-                <a href="#" class="btn-primary lg">Começar Grátis</a>
-            </div>
-        </div>
-    </section>
-
-
+        </section>
+    </main>
 {% endblock %}

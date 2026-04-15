@@ -2,199 +2,50 @@
 
 {% block title %}PetCare – Login{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/login/login.css') }}">
+{% endblock %}
+
 {% block body %}
-    <style>
-        /* Variáveis baseadas na sua definição e nas correções necessárias */
-        :root {
-            --laranja-vibrante: #F0783C;
-            --azul-escuro: #1A2B33;
-            --off-white: #F9F4ED;
-            --cinza-texto: #666666;
-            --branco-puro: #FFFFFF;
-            --verde-titulo: #729B87; /* Cor extraída visualmente da imagem */
-            --azul-link: #3282F6; /* Cor extraída visualmente da imagem */
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--off-white);
-            font-family: Arial, Helvetica, sans-serif; /* Fonte genérica para o corpo */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--cinza-texto);
-        }
-
-        /* Container do Logo (Topo Esquerdo) */
-        .header {
-            width: 100%;
-            padding: 30px 40px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: flex-start;
-        }
-
-        .logo-placeholder {
-            width: 60px;
-            height: 60px;
-            background-color: #e0d5c1; /* Fundo temporário simulando o ícone da caixa */
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: var(--cinza-texto);
-            text-align: center;
-        }
-
-        /* Título Central */
-        .main-title {
-            /* Idealmente, importe a fonte do Google Fonts. Ex: 'Caveat' ou 'Pacifico' */
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            color: var(--verde-titulo);
-            font-size: 3rem;
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 40px;
-            line-height: 1.2;
-            letter-spacing: 1px;
-        }
-
-        /* Card de Login */
-        .login-card {
-            background-color: var(--branco-puro);
-            padding: 50px 40px;
-            border-radius: 6px;
-            width: 100%;
-            max-width: 480px;
-            box-sizing: border-box;
-            /* Sombra leve baseada na imagem */
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.03);
-        }
-
-        /* Inputs */
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 15px;
-            border: 1px solid var(--laranja-vibrante);
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 1rem;
-            color: var(--cinza-texto);
-            outline: none;
-            transition: box-shadow 0.2s;
-        }
-
-        .input-group input:focus {
-            box-shadow: 0 0 0 2px rgba(240, 120, 60, 0.2);
-        }
-
-        .input-group input::placeholder {
-            color: #A0A0A0;
-        }
-
-        /* Links e Textos Auxiliares */
-        .helpers {
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-            color: var(--cinza-texto);
-        }
-
-        .helpers a {
-            color: var(--azul-link);
-            text-decoration: underline; /* Links na imagem possuem underline nativo ou induzido */
-            text-underline-offset: 2px;
-        }
-
-        .helpers a:hover {
-            color: #1c6ce0;
-        }
-
-        .helpers p {
-            margin: 10px 0 0 0;
-        }
-
-        /* Botão Principal */
-        .btn-submit {
-            background-color: var(--laranja-vibrante);
-            color: var(--branco-puro);
-            border: none;
-            width: 100%;
-            padding: 15px;
-            font-size: 1.25rem;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-bottom: 25px;
-            font-family: 'Times New Roman', Times, serif; /* O botão usa uma fonte serifada na imagem */
-            transition: background-color 0.2s;
-        }
-
-        .btn-submit:hover {
-            background-color: #e0662a;
-        }
-
-        /* Divisor "OU" */
-        .divider {
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 1rem;
-            color: var(--azul-escuro); /* Assumindo azul escuro para o texto sólido */
-        }
-
-        /* Login Alternativo */
-        .alt-login {
-            text-align: center;
-            font-size: 1rem;
-            color: var(--cinza-texto);
-        }
-
-        .alt-login a {
-            color: var(--azul-link);
-            text-decoration: underline;
-            text-underline-offset: 2px;
-        }
-    </style>
-
-
-    <div class="header">
-        <div class="logo-placeholder">[Ícone Caixa]</div>
-    </div>
 
     <h1 class="main-title">Que Bom te ver<br>Novamente!!!</h1>
 
-    <div class="login-card">
-        <form action="#" method="POST" onsubmit="event.preventDefault();">
+    <!--Form Cadastro-->
+    <section class="container mt-5">
 
-            <div class="input-group">
-                <label for="email">E-mail</label>
-                <input id="email" type="email" placeholder="teste@gmail.com" required>
+        <form method="POST" class="container d-flex justficy-content-center align-items-center"
+              style="flex-direction: column;"
+              ACTION="{{ path('app_cadastro') }}">
+
+            <div class="row">
+
+                <div class="col-12">
+                    <label class="form-label text-start" FOR="name">E-mail</label>
+                </div>
+                <div class="col-9">
+                    <input type="email" class="form-control p-2" id="email" name="email" minlength="2" required>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label text-start" FOR="senha">Senha</label>
+                </div>
+                <div class="col-9">
+                    <input type="password" class="form-control p-2" id="email" name="senha" minlength="2" required>
+                </div>
+
+                <div class="col-12 d-flex">
+                    <input type="submit" class="btn btn-primary mt-2 " value="Add">
+                </div>
+                <div class="helpers">
+                    <a href="#">Esqueceu a senha?</a>
+                </div>
+
+                <div class="divider">OU</div>
+
+                <div class="helpers">
+                    <p>Não tem uma conta? <a href="#">Criar uma</a></p>
+                </div>
             </div>
-
-            <div class="input-group">
-                <label for="password">Senha</label>
-                <input id="password" type="password" placeholder="Password" required>
-            </div>
-            <div class="helpers">
-                <a href="#">Esqueceu a senha?</a>
-            </div>
-
-            <button type="submit" class="btn-submit">Login</button>
-            <div class="divider">OU</div>
-
-            <div class="helpers">
-                <p>Não tem uma conta? <a href="#">Criar uma</a></p>
-            </div>
-            <!--<div class="alt-login">
-                Continue com um conta <a href="#">Google</a>
-            </div>-->
-
         </form>
-    </div>
-
+    </section>
 {% endblock %}
