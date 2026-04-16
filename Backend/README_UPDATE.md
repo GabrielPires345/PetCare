@@ -4,6 +4,44 @@
 
 Aplicação Spring Boot 4.0.5 que fornece uma API REST para a plataforma PetCare. Java 21, PostgreSQL, Spring Data JPA, Spring Security com autenticação JWT.
 
+## Pré-requisitos
+
+Para executar o projeto, você precisa ter instalado:
+- Java 21
+- Maven 3.8+
+- PostgreSQL (para ambiente de produção)
+
+## Acesso à Documentação
+
+### Swagger UI
+A documentação da API está disponível através do Swagger UI:
+- **Interface:** http://localhost:8080/swagger-ui.html
+- **JSON da API:** http://localhost:8080/api-docs
+
+### H2 Console
+Para acesso ao banco de dados em ambiente de desenvolvimento:
+- **Console:** http://localhost:8080/h2-console
+- **JDBC URL:** jdbc:h2:mem:petcare
+- **Usuário:** sa
+- **Senha:** (vazia)
+
+## Guia de Autenticação
+
+Para acessar os endpoints protegidos da API, é necessário obter um token JWT:
+
+1. **Obter token via endpoint de login:**
+   - **POST** `/api/auth/login`
+   - Envie email e senha no corpo da requisição
+   - O token será retornado na resposta
+
+2. **Usar token no Swagger UI:**
+   - Clique no botão "Authorize" (ícone de cadeado no canto superior direito)
+   - Insira: `Bearer <seu-token-jwt>`
+   - Clique em "Authorize"
+
+3. **Usar token em requisições:**
+   - Adicione o header: `Authorization: Bearer <seu-token-jwt>`
+
 ## Autenticação
 
 Todos os endpoints, exceto `/api/auth/**` e `/api/servicos/**`, exigem um token JWT válido.
@@ -101,7 +139,29 @@ Autentica um usuário e retorna um token JWT.
 
 ### 2. Agendamento (`/api/agendamentos`)
 
-#### POST `/api/agendamentos`
+#### GET `/api/agendamentos`
+
+Lista todos os agendamentos.
+
+**Autenticação:** Requerida (JWT)
+
+**Resposta (200 OK):**
+```json
+[
+  {
+    "id": "uuid",
+    "petName": "string",
+    "clinicaName": "string",
+    "veterinarioName": "string",
+    "servicoName": "string",
+    "dataHoraMarcada": "2026-04-15T10:00:00",
+    "status": "AGENDADO",
+    "valorFinal": 150.00
+  }
+]
+```
+
+---
 
 Agenda um novo atendimento. Valida se Pet, Clínica, Veterinário e Serviço existem. Define o status inicial como `AGENDADO` e calcula o `valorFinal` com base no preço do serviço.
 
@@ -796,7 +856,7 @@ Remove um telefone.
 | Controller | Caminho Base | Autenticação | Endpoints |
 |---|---|---|---|
 | Auth | `/api/auth` | Nenhuma | `POST /registro`, `POST /login` |
-| Agendamento | `/api/agendamentos` | JWT | `POST /`, `GET /{id}`, `GET /cliente/{clienteId}`, `DELETE /{id}` |
+| Agendamento | `/api/agendamentos` | JWT | `POST /`, `GET /`, `GET /{id}`, `GET /cliente/{clienteId}`, `DELETE /{id}` |
 | Cliente | `/api/clientes` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
 | Clínica | `/api/clinicas` | JWT | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
 | Serviço | `/api/servicos` | Nenhuma | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}` |
@@ -806,7 +866,7 @@ Remove um telefone.
 | Endereço | `/api/enderecos` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
 | Telefone | `/api/telefones` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
 
-**Total: 47 endpoints** em 10 controllers.
+**Total: 48 endpoints** em 10 controllers.
 
 ---
 
