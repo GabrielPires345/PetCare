@@ -1,5 +1,6 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.PetMapper;
 import com.petcare.mapper.request.PetRequest;
 import com.petcare.mapper.response.PetResponse;
@@ -21,7 +22,7 @@ public class PetService {
 
     public PetResponse adicionarPet(UUID clienteId, PetRequest petRequest) {
         Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado"));
 
         Pet pet = PetMapper.toPet(petRequest);
         pet.setCliente(cliente);
@@ -32,13 +33,13 @@ public class PetService {
 
     public PetResponse getPetById(UUID petId) {
         Pet pet = petRepository.findById(petId)
-                .orElseThrow(() -> new RuntimeException("Pet not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pet não encontrado"));
         return PetMapper.toPetResponse(pet);
     }
 
     public void deletePet(UUID petId) {
         if (!petRepository.existsById(petId)) {
-            throw new RuntimeException("Pet not found");
+            throw new RecursoNaoEncontradoException("Pet não encontrado");
         }
         petRepository.deleteById(petId);
     }

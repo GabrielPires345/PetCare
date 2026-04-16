@@ -1,5 +1,6 @@
 package com.petcare.controller;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.UserMapper;
 import com.petcare.mapper.request.ClienteCreateRequest;
 import com.petcare.mapper.request.UserRequest;
@@ -37,14 +38,14 @@ public class AuthController {
     @PostMapping("/registro")
     public ResponseEntity<?> registrarCliente(@Valid @RequestBody ClienteCreateRequest clienteCreateRequest) {
         if (!clienteCreateRequest.senha().equals(clienteCreateRequest.confirmaSenha())) {
-            return ResponseEntity.badRequest().body("As senhas não conferem");
+            return ResponseEntity.badRequest().body(Map.of("erro", "As senhas não conferem"));
         }
         Usuario savedUsuario = usuarioService.criarUsuarioParaNovoCliente(clienteCreateRequest);
 
         clienteService.registrarNovoCliente(clienteCreateRequest, savedUsuario);
 
         Cliente cliente = clienteRepository.findByUsuarioId(savedUsuario.getId())
-                .orElseThrow(() -> new RuntimeException("Cliente not found after registration"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado após o registro"));
 
         String token = jwtUtil.generateToken(savedUsuario.getId(), savedUsuario.getEmail());
         UserResponse userResponse = UserMapper.toUserResponse(savedUsuario);
@@ -67,10 +68,10 @@ public class AuthController {
             );
 
             Usuario usuario = usuarioRepository.findByEmail(loginRequest.email())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
             Cliente cliente = clienteRepository.findByUsuarioId(usuario.getId())
-                    .orElseThrow(() -> new RuntimeException("Cliente profile not found"));
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Perfil de cliente não encontrado"));
 
             String token = jwtUtil.generateToken(usuario.getId(), usuario.getEmail());
             UserResponse response = UserMapper.toUserResponse(usuario);
@@ -82,7 +83,7 @@ public class AuthController {
 
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("erro", "Credenciais inválidas"));
         }
     }
 }

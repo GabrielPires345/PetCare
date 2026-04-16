@@ -73,7 +73,7 @@ public class ClinicaController {
 
     // Telefones da clinica
     @PostMapping("/{id}/telefones")
-    public ResponseEntity<TelefoneResponse> adicionarTelefone(@PathVariable UUID id, @RequestBody TelefoneRequest telefoneRequest) {
+    public ResponseEntity<TelefoneResponse> adicionarTelefone(@PathVariable UUID id, @Valid @RequestBody TelefoneRequest telefoneRequest) {
         TelefoneResponse telefone = telefoneService.criarTelefoneParaClinica(id, telefoneRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(telefone);
     }

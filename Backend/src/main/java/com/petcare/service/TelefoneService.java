@@ -1,5 +1,6 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.TelefoneMapper;
 import com.petcare.mapper.request.TelefoneRequest;
 import com.petcare.mapper.response.TelefoneResponse;
@@ -11,6 +12,7 @@ import com.petcare.repository.ClinicaRepository;
 import com.petcare.repository.TelefoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,9 +26,10 @@ public class TelefoneService {
     private final ClienteRepository clienteRepository;
     private final ClinicaRepository clinicaRepository;
 
+    @Transactional
     public TelefoneResponse criarTelefoneParaCliente(UUID clienteId, TelefoneRequest telefoneRequest) {
         Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado"));
 
         Telefone telefone = TelefoneMapper.toTelefone(telefoneRequest);
         telefone.setCliente(cliente);
@@ -36,9 +39,10 @@ public class TelefoneService {
         return TelefoneMapper.toTelefoneResponse(savedTelefone);
     }
 
+    @Transactional
     public TelefoneResponse criarTelefoneParaClinica(UUID clinicaId, TelefoneRequest telefoneRequest) {
         Clinica clinica = clinicaRepository.findById(clinicaId)
-                .orElseThrow(() -> new RuntimeException("Clinica not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Clínica não encontrada"));
 
         Telefone telefone = TelefoneMapper.toTelefone(telefoneRequest);
         telefone.setClinica(clinica);
@@ -50,7 +54,7 @@ public class TelefoneService {
 
     public TelefoneResponse getTelefoneById(UUID id) {
         Telefone telefone = telefoneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Telefone not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Telefone não encontrado"));
         return TelefoneMapper.toTelefoneResponse(telefone);
     }
 
@@ -72,9 +76,10 @@ public class TelefoneService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public TelefoneResponse atualizarTelefone(UUID id, TelefoneRequest telefoneRequest) {
         Telefone telefone = telefoneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Telefone not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Telefone não encontrado"));
 
         telefone.setDdd(telefoneRequest.ddd());
         telefone.setNumero(telefoneRequest.numero());
@@ -84,9 +89,10 @@ public class TelefoneService {
         return TelefoneMapper.toTelefoneResponse(updatedTelefone);
     }
 
+    @Transactional
     public void deletarTelefone(UUID id) {
         if (!telefoneRepository.existsById(id)) {
-            throw new RuntimeException("Telefone not found");
+            throw new RecursoNaoEncontradoException("Telefone não encontrado");
         }
         telefoneRepository.deleteById(id);
     }

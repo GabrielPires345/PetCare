@@ -1,5 +1,6 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.EspecialidadeMapper;
 import com.petcare.mapper.request.EspecialidadeRequest;
 import com.petcare.mapper.response.EspecialidadeResponse;
@@ -7,6 +8,7 @@ import com.petcare.model.Especialidade;
 import com.petcare.repository.EspecialidadeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +20,7 @@ public class EspecialidadeService {
 
     private final EspecialidadeRepository especialidadeRepository;
 
+    @Transactional
     public EspecialidadeResponse criarEspecialidade(EspecialidadeRequest especialidadeRequest) {
         Especialidade especialidade = EspecialidadeMapper.toEspecialidade(especialidadeRequest);
         Especialidade savedEspecialidade = especialidadeRepository.save(especialidade);
@@ -26,7 +29,7 @@ public class EspecialidadeService {
 
     public EspecialidadeResponse getEspecialidadeById(UUID id) {
         Especialidade especialidade = especialidadeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialidade not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Especialidade não encontrada"));
         return EspecialidadeMapper.toEspecialidadeResponse(especialidade);
     }
 
@@ -36,18 +39,20 @@ public class EspecialidadeService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public EspecialidadeResponse atualizarEspecialidade(UUID id, EspecialidadeRequest especialidadeRequest) {
         Especialidade especialidade = especialidadeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialidade not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Especialidade não encontrada"));
 
         especialidade.setNome(especialidadeRequest.nome());
         Especialidade updatedEspecialidade = especialidadeRepository.save(especialidade);
         return EspecialidadeMapper.toEspecialidadeResponse(updatedEspecialidade);
     }
 
+    @Transactional
     public void deletarEspecialidade(UUID id) {
         if (!especialidadeRepository.existsById(id)) {
-            throw new RuntimeException("Especialidade not found");
+            throw new RecursoNaoEncontradoException("Especialidade não encontrada");
         }
         especialidadeRepository.deleteById(id);
     }

@@ -1,5 +1,6 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.ClinicaMapper;
 import com.petcare.mapper.request.ClinicaRequest;
 import com.petcare.mapper.response.ClinicaResponse;
@@ -43,7 +44,7 @@ public class ClinicaService {
 
     public ClinicaResponse getClinicaById(UUID id) {
         Clinica clinica = clinicaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Clinica not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Clínica não encontrada"));
         return ClinicaMapper.toClinicaResponse(clinica);
     }
 
@@ -53,9 +54,10 @@ public class ClinicaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ClinicaResponse updateClinica(UUID id, ClinicaRequest clinicaRequest) {
         Clinica clinica = clinicaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Clinica not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Clínica não encontrada"));
         clinica.setNomeClinica(clinicaRequest.nomeClinica());
         clinica.setRazaoSocial(clinicaRequest.razaoSocial());
         clinica.setCnpj(clinicaRequest.cnpj());
@@ -66,7 +68,7 @@ public class ClinicaService {
 
     public void deleteClinica(UUID id) {
         if (!clinicaRepository.existsById(id)) {
-            throw new RuntimeException("Clinica not found");
+            throw new RecursoNaoEncontradoException("Clínica não encontrada");
         }
         clinicaRepository.deleteById(id);
     }
