@@ -1,5 +1,6 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.VeterinarioMapper;
 import com.petcare.mapper.request.VeterinarioRequest;
 import com.petcare.mapper.response.VeterinarioResponse;
@@ -36,7 +37,7 @@ public class VeterinarioService {
 
     public VeterinarioResponse getVeterinarioById(UUID id) {
         Veterinario veterinario = veterinarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Veterinario not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Veterinário não encontrado"));
         return VeterinarioMapper.toVeterinarioResponse(veterinario);
     }
 
@@ -60,7 +61,7 @@ public class VeterinarioService {
     @Transactional
     public VeterinarioResponse updateVeterinario(UUID id, VeterinarioRequest request) {
         Veterinario veterinario = veterinarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Veterinario not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Veterinário não encontrado"));
 
         veterinario.setNome(request.nome());
         veterinario.setCrmv(request.crmv());
@@ -68,7 +69,7 @@ public class VeterinarioService {
         if (request.especialidadeIds() != null) {
             Set<Especialidade> especialidades = request.especialidadeIds().stream()
                     .map(especialidadeId -> especialidadeRepository.findById(especialidadeId)
-                            .orElseThrow(() -> new RuntimeException("Especialidade not found: " + especialidadeId)))
+                            .orElseThrow(() -> new RecursoNaoEncontradoException("Especialidade não encontrada: " + especialidadeId)))
                     .collect(Collectors.toSet());
             veterinario.setEspecialidades(especialidades);
         }
@@ -78,7 +79,7 @@ public class VeterinarioService {
 
     public void deleteVeterinario(UUID id) {
         if (!veterinarioRepository.existsById(id)) {
-            throw new RuntimeException("Veterinario not found");
+            throw new RecursoNaoEncontradoException("Veterinário não encontrado");
         }
         veterinarioRepository.deleteById(id);
     }

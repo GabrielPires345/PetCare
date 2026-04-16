@@ -3,6 +3,7 @@ package com.petcare.controller;
 import com.petcare.mapper.request.TelefoneRequest;
 import com.petcare.mapper.response.TelefoneResponse;
 import com.petcare.service.TelefoneService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class TelefoneController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TelefoneResponse> atualizarTelefone(@PathVariable UUID id, @RequestBody TelefoneRequest telefoneRequest) {
+    public ResponseEntity<TelefoneResponse> atualizarTelefone(@PathVariable UUID id, @Valid @RequestBody TelefoneRequest telefoneRequest) {
         TelefoneResponse telefone = telefoneService.atualizarTelefone(id, telefoneRequest);
         return ResponseEntity.ok(telefone);
     }

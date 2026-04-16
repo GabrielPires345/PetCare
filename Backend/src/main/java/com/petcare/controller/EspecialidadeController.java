@@ -38,7 +38,7 @@ public class EspecialidadeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EspecialidadeResponse> atualizarEspecialidade(@PathVariable UUID id, @RequestBody EspecialidadeRequest especialidadeRequest) {
+    public ResponseEntity<EspecialidadeResponse> atualizarEspecialidade(@PathVariable UUID id, @Valid @RequestBody EspecialidadeRequest especialidadeRequest) {
         EspecialidadeResponse especialidade = especialidadeService.atualizarEspecialidade(id, especialidadeRequest);
         return ResponseEntity.ok(especialidade);
     }
