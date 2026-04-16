@@ -1,5 +1,6 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.EnderecoMapper;
 import com.petcare.mapper.request.EnderecoRequest;
 import com.petcare.mapper.response.EnderecoResponse;
@@ -11,6 +12,7 @@ import com.petcare.repository.ClinicaRepository;
 import com.petcare.repository.EnderecoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,9 +26,10 @@ public class EnderecoService {
     private final ClienteRepository clienteRepository;
     private final ClinicaRepository clinicaRepository;
 
+    @Transactional
     public EnderecoResponse criarEnderecoParaCliente(UUID clienteId, EnderecoRequest enderecoRequest) {
         Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado"));
 
         Endereco endereco = EnderecoMapper.toEndereco(enderecoRequest);
         endereco.setCliente(cliente);
@@ -36,9 +39,10 @@ public class EnderecoService {
         return EnderecoMapper.toEnderecoResponse(savedEndereco);
     }
 
+    @Transactional
     public EnderecoResponse criarEnderecoParaClinica(UUID clinicaId, EnderecoRequest enderecoRequest) {
         Clinica clinica = clinicaRepository.findById(clinicaId)
-                .orElseThrow(() -> new RuntimeException("Clinica not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Clínica não encontrada"));
 
         Endereco endereco = EnderecoMapper.toEndereco(enderecoRequest);
         endereco.setClinica(clinica);
@@ -50,7 +54,7 @@ public class EnderecoService {
 
     public EnderecoResponse getEnderecoById(UUID id) {
         Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Endereco not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço não encontrado"));
         return EnderecoMapper.toEnderecoResponse(endereco);
     }
 
@@ -72,9 +76,10 @@ public class EnderecoService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public EnderecoResponse atualizarEndereco(UUID id, EnderecoRequest enderecoRequest) {
         Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Endereco not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço não encontrado"));
 
         endereco.setBairro(enderecoRequest.bairro());
         endereco.setNumero(enderecoRequest.numero());
@@ -87,9 +92,10 @@ public class EnderecoService {
         return EnderecoMapper.toEnderecoResponse(updatedEndereco);
     }
 
+    @Transactional
     public void deletarEndereco(UUID id) {
         if (!enderecoRepository.existsById(id)) {
-            throw new RuntimeException("Endereco not found");
+            throw new RecursoNaoEncontradoException("Endereço não encontrado");
         }
         enderecoRepository.deleteById(id);
     }

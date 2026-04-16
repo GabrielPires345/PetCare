@@ -1,5 +1,7 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoDuplicadoException;
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.ClienteMapper;
 import com.petcare.mapper.PetMapper;
 import com.petcare.mapper.request.ClienteCreateRequest;
@@ -11,7 +13,6 @@ import com.petcare.model.Pet;
 import com.petcare.model.Usuario;
 import com.petcare.repository.ClienteRepository;
 import com.petcare.repository.PetRepository;
-import com.petcare.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +46,7 @@ public class ClienteService {
 
     public ClienteResponse getClienteById(UUID id) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado"));
         return ClienteMapper.toResponse(cliente);
     }
 
@@ -55,15 +56,16 @@ public class ClienteService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ClienteResponse updateCliente(UUID id, ClienteUpdateRequest clienteUpdateRequest) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente não encontrado"));
 
         // Verificar se o CPF já existe em outro cliente
         clienteRepository.findByCpf(clienteUpdateRequest.cpf())
                 .ifPresent(existingCliente -> {
                     if (!existingCliente.getId().equals(id)) {
-                        throw new RuntimeException("CPF já cadastrado para outro cliente");
+                        throw new RecursoDuplicadoException("CPF já cadastrado para outro cliente");
                     }
                 });
 
@@ -74,7 +76,7 @@ public class ClienteService {
 
     public void deleteCliente(UUID id) {
         if (!clienteRepository.existsById(id)) {
-            throw new RuntimeException("Cliente not found");
+            throw new RecursoNaoEncontradoException("Cliente não encontrado");
         }
         clienteRepository.deleteById(id);
     }

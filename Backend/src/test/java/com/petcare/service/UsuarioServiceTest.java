@@ -83,7 +83,7 @@ class UsuarioServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
             usuarioService.criarUsuarioParaNovoCliente(dto));
 
-        assertEquals("Email already registered", exception.getMessage());
+        assertEquals("Email já cadastrado", exception.getMessage());
         verify(usuarioRepository, never()).save(any());
     }
 

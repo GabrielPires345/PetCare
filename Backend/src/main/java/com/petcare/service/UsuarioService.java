@@ -1,16 +1,17 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoDuplicadoException;
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.UserMapper;
 import com.petcare.mapper.request.ClienteCreateRequest;
 import com.petcare.mapper.request.UserRequest;
 import com.petcare.mapper.response.UserResponse;
 import com.petcare.model.Usuario;
 import com.petcare.repository.UsuarioRepository;
-import jakarta.transaction.Transactional;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +22,6 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    @Getter
     private final PasswordEncoder passwordEncoder;
 
     public boolean existsByEmail(String email) {
@@ -32,7 +32,7 @@ public class UsuarioService {
     public Usuario criarUsuarioParaNovoCliente(ClienteCreateRequest dto) {
         // Verifica se o e-mail já está cadastrado
         if (usuarioRepository.findByEmail(dto.email()).isPresent()) {
-            throw new RuntimeException("Email already registered");
+            throw new RecursoDuplicadoException("Email já cadastrado");
         }
 
         Usuario usuario = Usuario.builder()
@@ -47,7 +47,7 @@ public class UsuarioService {
 
     public UserResponse getUsuarioById(UUID id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
         return UserMapper.toUserResponse(usuario);
     }
 
@@ -57,9 +57,10 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public UserResponse updateUsuario(UUID id, UserRequest userRequest) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
         usuario.setEmail(userRequest.email());
         usuario.setNivelAcesso(userRequest.nivelAcesso());
@@ -70,7 +71,7 @@ public class UsuarioService {
 
     public void deleteUsuario(UUID id) {
         if (!usuarioRepository.existsById(id)) {
-            throw new RuntimeException("Usuario not found");
+            throw new RecursoNaoEncontradoException("Usuário não encontrado");
         }
         usuarioRepository.deleteById(id);
     }

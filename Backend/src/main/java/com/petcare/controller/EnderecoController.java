@@ -3,6 +3,7 @@ package com.petcare.controller;
 import com.petcare.mapper.request.EnderecoRequest;
 import com.petcare.mapper.response.EnderecoResponse;
 import com.petcare.service.EnderecoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class EnderecoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EnderecoResponse> atualizarEndereco(@PathVariable UUID id, @RequestBody EnderecoRequest enderecoRequest) {
+    public ResponseEntity<EnderecoResponse> atualizarEndereco(@PathVariable UUID id, @Valid @RequestBody EnderecoRequest enderecoRequest) {
         EnderecoResponse endereco = enderecoService.atualizarEndereco(id, enderecoRequest);
         return ResponseEntity.ok(endereco);
     }

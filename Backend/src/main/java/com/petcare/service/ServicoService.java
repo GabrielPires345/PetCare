@@ -1,5 +1,6 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.ServicoMapper;
 import com.petcare.mapper.request.ServicoRequest;
 import com.petcare.mapper.response.ServicoResponse;
@@ -34,14 +35,14 @@ public class ServicoService {
 
     public ServicoResponse getServicoById(UUID id) {
         Servico servico = servicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Servico not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Serviço não encontrado"));
         return ServicoMapper.toServicoResponse(servico);
     }
 
     @Transactional
     public ServicoResponse updateServico(UUID id, ServicoRequest request) {
         Servico servico = servicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Servico not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Serviço não encontrado"));
 
         servico.setNome(request.nome());
         servico.setDescricao(request.descricao());
@@ -53,7 +54,7 @@ public class ServicoService {
 
     public void deleteServico(UUID id) {
         if (!servicoRepository.existsById(id)) {
-            throw new RuntimeException("Servico not found");
+            throw new RecursoNaoEncontradoException("Serviço não encontrado");
         }
         servicoRepository.deleteById(id);
     }

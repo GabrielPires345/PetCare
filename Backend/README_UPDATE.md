@@ -1,101 +1,101 @@
-# PetCare Backend - API Documentation
+# PetCare Backend - Documentação da API
 
-## Overview
+## Visão Geral
 
-Spring Boot 4.0.5 application providing REST API for the PetCare platform. Java 21, PostgreSQL, Spring Data JPA, Spring Security with JWT authentication.
+Aplicação Spring Boot 4.0.5 que fornece uma API REST para a plataforma PetCare. Java 21, PostgreSQL, Spring Data JPA, Spring Security com autenticação JWT.
 
-## Authentication
+## Autenticação
 
-All endpoints except `/api/auth/**` and `/api/servicos/**` require a valid JWT token.
+Todos os endpoints, exceto `/api/auth/**` e `/api/servicos/**`, exigem um token JWT válido.
 
-To authenticate, include the token in the `Authorization` header:
+Para autenticar, inclua o token no header `Authorization`:
 
 ```
-Authorization: Bearer <your-jwt-token>
+Authorization: Bearer <seu-token-jwt>
 ```
 
 ---
 
 ## Endpoints
 
-### 1. Authentication (`/api/auth`)
+### 1. Autenticação (`/api/auth`)
 
 #### POST `/api/auth/registro`
 
-Registers a new client (creates User + Client Profile + Pet). Returns a JWT token.
+Registra um novo cliente (cria Usuário + Perfil de Cliente + Pet). Retorna um token JWT.
 
-**Auth:** Not required
+**Autenticação:** Não requerida
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required | Validation |
+| Campo | Tipo | Obrigatório | Validação |
 |---|---|---|---|
-| `username` | String | Yes | Max 10 characters |
-| `email` | String | Yes | Must be a valid email format |
-| `password` | String | Yes | - |
-| `confirmPassword` | String | Yes | Must match `password` |
-| `fullName` | String | Yes | - |
-| `cpf` | String | Yes | 11-14 characters |
-| `birthDate` | LocalDate | Yes | ISO format: `yyyy-MM-dd` |
-| `pet` | PetRequest | Yes | Nested object (see below) |
+| `nomeUsuario` | String | Sim | Máximo 10 caracteres |
+| `email` | String | Sim | Deve ser um formato de e-mail válido |
+| `senha` | String | Sim | - |
+| `confirmaSenha` | String | Sim | Deve ser igual a `senha` |
+| `nomeCompleto` | String | Sim | - |
+| `cpf` | String | Sim | 11-14 caracteres |
+| `dataNascimento` | LocalDate | Sim | Formato ISO: `yyyy-MM-dd` |
+| `pet` | PetRequest | Sim | Objeto aninhado (veja abaixo) |
 
-**PetRequest (nested):**
+**PetRequest (aninhado):**
 
-| Field | Type | Required | Validation |
+| Campo | Tipo | Obrigatório | Validação |
 |---|---|---|---|
-| `name` | String | Yes | - |
-| `species` | String | Yes | - |
-| `gender` | String | Yes | - |
-| `weight` | Double | Yes | - |
-| `birthDate` | LocalDate | Yes | ISO format: `yyyy-MM-dd` |
-| `neutered` | Boolean | Yes | - |
+| `nome` | String | Sim | - |
+| `especie` | String | Sim | - |
+| `sexo` | String | Sim | - |
+| `peso` | Double | Sim | - |
+| `dataNascimento` | LocalDate | Sim | Formato ISO: `yyyy-MM-dd` |
+| `castrado` | Boolean | Sim | - |
 
-**Response (201 Created):**
+**Resposta (201 Created):**
 ```json
 {
   "user": {
     "id": "uuid",
-    "username": "string",
+    "nomeUsuario": "string",
     "email": "string",
-    "accessLevel": "CLIENTE"
+    "nivelAcesso": "CLIENTE"
   },
   "token": "eyJhbGci..."
 }
 ```
 
-**Response (400 Bad Request):**
-- `"Passwords do not match"` if `password` != `confirmPassword`
+**Resposta (400 Bad Request):**
+- `"As senhas não conferem"` se `senha` != `confirmaSenha`
 
 ---
 
 #### POST `/api/auth/login`
 
-Authenticates a user and returns a JWT token.
+Autentica um usuário e retorna um token JWT.
 
-**Auth:** Not required
+**Autenticação:** Não requerida
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required |
+| Campo | Tipo | Obrigatório |
 |---|---|---|
-| `email` | String | Yes |
-| `password` | String | Yes |
+| `email` | String | Sim |
+| `senha` | String | Sim |
 
-**Response (200 OK):**
+**Resposta (200 OK):**
 ```json
 {
   "user": {
     "id": "uuid",
-    "username": "string",
+    "nomeUsuario": "string",
     "email": "string",
-    "accessLevel": "CLIENTE"
+    "nivelAcesso": "CLIENTE"
   },
   "clienteId": "uuid",
   "token": "eyJhbGci..."
 }
 ```
 
-**Response (401 Unauthorized):** `"Invalid credentials"`
+**Resposta (401 Unauthorized):** `"Invalid credentials"`
 
 ---
 
@@ -103,21 +103,21 @@ Authenticates a user and returns a JWT token.
 
 #### POST `/api/agendamentos`
 
-Schedules a new appointment. Validates that Pet, Clinic, Veterinarian, and Service exist. Sets initial status to `AGENDADO` and calculates `valorFinal` based on the service price.
+Agenda um novo atendimento. Valida se Pet, Clínica, Veterinário e Serviço existem. Define o status inicial como `AGENDADO` e calcula o `valorFinal` com base no preço do serviço.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required |
+| Campo | Tipo | Obrigatório |
 |---|---|---|
-| `petId` | UUID | Yes |
-| `clinicaId` | UUID | Yes |
-| `veterinarioId` | UUID | Yes |
-| `servicoId` | UUID | Yes |
-| `dataHoraMarcada` | LocalDateTime | Yes | ISO format: `yyyy-MM-ddTHH:mm:ss` |
+| `petId` | UUID | Sim |
+| `clinicaId` | UUID | Sim |
+| `veterinarioId` | UUID | Sim |
+| `servicoId` | UUID | Sim |
+| `dataHoraMarcada` | LocalDateTime | Sim | Formato ISO: `yyyy-MM-ddTHH:mm:ss` |
 
-**Response (201 Created):**
+**Resposta (201 Created):**
 ```json
 {
   "id": "uuid",
@@ -135,21 +135,21 @@ Schedules a new appointment. Validates that Pet, Clinic, Veterinarian, and Servi
 
 #### GET `/api/agendamentos/{id}`
 
-Retrieves an appointment by ID.
+Busca um agendamento pelo ID.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `AgendamentoResponse` (same structure as above)
+**Resposta (200 OK):** `AgendamentoResponse` (mesma estrutura acima)
 
 ---
 
 #### GET `/api/agendamentos/cliente/{clienteId}`
 
-Lists all appointments for a specific client.
+Lista todos os agendamentos de um cliente específico.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):**
+**Resposta (200 OK):**
 ```json
 [
   {
@@ -169,11 +169,11 @@ Lists all appointments for a specific client.
 
 #### DELETE `/api/agendamentos/{id}`
 
-Cancels an appointment. Status is updated to `CANCELADO`.
+Cancela um agendamento. O status é atualizado para `CANCELADO`.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
@@ -181,18 +181,18 @@ Cancels an appointment. Status is updated to `CANCELADO`.
 
 #### GET `/api/clientes`
 
-Lists all registered clients.
+Lista todos os clientes registrados.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):**
+**Resposta (200 OK):**
 ```json
 [
   {
     "id": "uuid",
-    "fullName": "string",
+    "nomeCompleto": "string",
     "cpf": "string",
-    "birthDate": "2000-01-01"
+    "dataNascimento": "2000-01-01"
   }
 ]
 ```
@@ -201,69 +201,69 @@ Lists all registered clients.
 
 #### GET `/api/clientes/{id}`
 
-Retrieves a client by ID.
+Busca um cliente pelo ID.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `ClienteResponse` (same structure as above)
+**Resposta (200 OK):** `ClienteResponse` (mesma estrutura acima)
 
 ---
 
 #### PUT `/api/clientes/{id}`
 
-Updates a client's profile information.
+Atualiza as informações do perfil de um cliente.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required |
+| Campo | Tipo | Obrigatório |
 |---|---|---|
-| `fullName` | String | Yes |
-| `cpf` | String | Yes | 11-14 characters |
-| `birthDate` | LocalDate | Yes |
+| `nomeCompleto` | String | Sim |
+| `cpf` | String | Sim | 11-14 caracteres |
+| `dataNascimento` | LocalDate | Sim |
 
-**Response (200 OK):** Updated `ClienteResponse`
+**Resposta (200 OK):** `ClienteResponse` atualizado
 
 ---
 
 #### DELETE `/api/clientes/{id}`
 
-Deletes a client (soft delete).
+Remove um cliente (soft delete).
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
 #### POST `/api/clientes/{id}/enderecos`
 
-Adds an address to a client.
+Adiciona um endereço a um cliente.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required | Validation |
+| Campo | Tipo | Obrigatório | Validação |
 |---|---|---|---|
-| `street` | String | Yes | - |
-| `number` | String | Yes | - |
-| `neighborhood` | String | Yes | - |
-| `city` | String | Yes | - |
-| `state` | String | Yes | Max 2 characters (e.g., `SP`) |
-| `zipCode` | String | Yes | - |
+| `logradouro` | String | Sim | - |
+| `numero` | String | Sim | - |
+| `bairro` | String | Sim | - |
+| `cidade` | String | Sim | - |
+| `uf` | String | Sim | Máximo 2 caracteres (ex: `SP`) |
+| `cep` | String | Sim | - |
 
-**Response (201 Created):**
+**Resposta (201 Created):**
 ```json
 {
   "id": "uuid",
-  "street": "string",
-  "number": "string",
-  "neighborhood": "string",
-  "city": "string",
-  "state": "SP",
-  "zipCode": "string"
+  "logradouro": "string",
+  "numero": "string",
+  "bairro": "string",
+  "cidade": "string",
+  "uf": "SP",
+  "cep": "string"
 }
 ```
 
@@ -271,35 +271,35 @@ Adds an address to a client.
 
 #### GET `/api/clientes/{id}/enderecos`
 
-Lists all addresses for a client.
+Lista todos os endereços de um cliente.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `List<EnderecoResponse>`
+**Resposta (200 OK):** `List<EnderecoResponse>`
 
 ---
 
 #### POST `/api/clientes/{id}/telefones`
 
-Adds a phone number to a client.
+Adiciona um telefone a um cliente.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required | Validation |
+| Campo | Tipo | Obrigatório | Validação |
 |---|---|---|---|
-| `ddd` | String | Yes | Max 2 characters |
-| `number` | String | Yes | - |
-| `isWhatsApp` | Boolean | Yes | - |
+| `ddd` | String | Sim | Máximo 2 caracteres |
+| `numero` | String | Sim | - |
+| `whatsapp` | Boolean | Sim | - |
 
-**Response (201 Created):**
+**Resposta (201 Created):**
 ```json
 {
   "id": "uuid",
   "ddd": "11",
-  "number": "999999999",
-  "isWhatsApp": true
+  "numero": "999999999",
+  "whatsapp": true
 }
 ```
 
@@ -307,29 +307,29 @@ Adds a phone number to a client.
 
 #### GET `/api/clientes/{id}/telefones`
 
-Lists all phone numbers for a client.
+Lista todos os telefones de um cliente.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `List<TelefoneResponse>`
+**Resposta (200 OK):** `List<TelefoneResponse>`
 
 ---
 
-### 4. Clinica (`/api/clinicas`)
+### 4. Clínica (`/api/clinicas`)
 
 #### GET `/api/clinicas`
 
-Lists all clinics.
+Lista todas as clínicas.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):**
+**Resposta (200 OK):**
 ```json
 [
   {
     "id": "uuid",
-    "clinicName": "string",
-    "corporateName": "string",
+    "nomeClinica": "string",
+    "razaoSocial": "string",
     "cnpj": "string"
   }
 ]
@@ -339,107 +339,107 @@ Lists all clinics.
 
 #### GET `/api/clinicas/{id}`
 
-Retrieves a clinic by ID.
+Busca uma clínica pelo ID.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `ClinicaResponse` (same structure as above)
+**Resposta (200 OK):** `ClinicaResponse` (mesma estrutura acima)
 
 ---
 
 #### POST `/api/clinicas`
 
-Creates a new clinic.
+Cria uma nova clínica.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required |
+| Campo | Tipo | Obrigatório |
 |---|---|---|
-| `clinicName` | String | Yes |
-| `corporateName` | String | Yes |
-| `cnpj` | String | Yes | Valid CNPJ format |
+| `nomeClinica` | String | Sim |
+| `razaoSocial` | String | Sim |
+| `cnpj` | String | Sim | Formato de CNPJ válido |
 
-**Response (201 Created):** `ClinicaResponse`
+**Resposta (201 Created):** `ClinicaResponse`
 
 ---
 
 #### PUT `/api/clinicas/{id}`
 
-Updates a clinic.
+Atualiza uma clínica.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:** Same as POST `/api/clinicas`
+**Corpo da Requisição:** Mesmo do POST `/api/clinicas`
 
-**Response (200 OK):** Updated `ClinicaResponse`
+**Resposta (200 OK):** `ClinicaResponse` atualizado
 
 ---
 
 #### DELETE `/api/clinicas/{id}`
 
-Deletes a clinic.
+Remove uma clínica.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
 #### POST `/api/clinicas/{id}/enderecos`
 
-Adds an address to a clinic.
+Adiciona um endereço a uma clínica.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:** Same fields as `/api/clientes/{id}/enderecos`
+**Corpo da Requisição:** Mesmos campos de `/api/clientes/{id}/enderecos`
 
-**Response (201 Created):** `EnderecoResponse`
+**Resposta (201 Created):** `EnderecoResponse`
 
 ---
 
 #### GET `/api/clinicas/{id}/enderecos`
 
-Lists all addresses for a clinic.
+Lista todos os endereços de uma clínica.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `List<EnderecoResponse>`
+**Resposta (200 OK):** `List<EnderecoResponse>`
 
 ---
 
 #### POST `/api/clinicas/{id}/telefones`
 
-Adds a phone number to a clinic.
+Adiciona um telefone a uma clínica.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:** Same fields as `/api/clientes/{id}/telefones`
+**Corpo da Requisição:** Mesmos campos de `/api/clientes/{id}/telefones`
 
-**Response (201 Created):** `TelefoneResponse`
+**Resposta (201 Created):** `TelefoneResponse`
 
 ---
 
 #### GET `/api/clinicas/{id}/telefones`
 
-Lists all phone numbers for a clinic.
+Lista todos os telefones de uma clínica.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `List<TelefoneResponse>`
+**Resposta (200 OK):** `List<TelefoneResponse>`
 
 ---
 
-### 5. Servico (`/api/servicos`)
+### 5. Serviço (`/api/servicos`)
 
 #### GET `/api/servicos`
 
-Lists all available services.
+Lista todos os serviços disponíveis.
 
-**Auth:** Not required
+**Autenticação:** Não requerida
 
-**Response (200 OK):**
+**Resposta (200 OK):**
 ```json
 [
   {
@@ -456,52 +456,52 @@ Lists all available services.
 
 #### GET `/api/servicos/{id}`
 
-Retrieves a service by ID.
+Busca um serviço pelo ID.
 
-**Auth:** Not required
+**Autenticação:** Não requerida
 
-**Response (200 OK):** `ServicoResponse` (same structure as above)
+**Resposta (200 OK):** `ServicoResponse` (mesma estrutura acima)
 
 ---
 
 #### POST `/api/servicos`
 
-Creates a new service.
+Cria um novo serviço.
 
-**Auth:** Not required
+**Autenticação:** Não requerida
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required |
+| Campo | Tipo | Obrigatório |
 |---|---|---|
-| `nome` | String | Yes |
-| `descricao` | String | No |
-| `precoBase` | BigDecimal | Yes |
-| `duracaoMinutos` | Integer | Yes |
+| `nome` | String | Sim |
+| `descricao` | String | Não |
+| `precoBase` | BigDecimal | Sim |
+| `duracaoMinutos` | Integer | Sim |
 
-**Response (201 Created):** `ServicoResponse`
+**Resposta (201 Created):** `ServicoResponse`
 
 ---
 
 #### PUT `/api/servicos/{id}`
 
-Updates a service.
+Atualiza um serviço.
 
-**Auth:** Not required
+**Autenticação:** Não requerida
 
-**Request Body:** Same as POST `/api/servicos`
+**Corpo da Requisição:** Mesmo do POST `/api/servicos`
 
-**Response (200 OK):** Updated `ServicoResponse`
+**Resposta (200 OK):** `ServicoResponse` atualizado
 
 ---
 
 #### DELETE `/api/servicos/{id}`
 
-Deletes a service.
+Remove um serviço.
 
-**Auth:** Not required
+**Autenticação:** Não requerida
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
@@ -509,31 +509,31 @@ Deletes a service.
 
 #### POST `/api/pets/cliente/{clienteId}`
 
-Adds a new pet to a client.
+Adiciona um novo pet a um cliente.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required |
+| Campo | Tipo | Obrigatório |
 |---|---|---|
-| `name` | String | Yes |
-| `species` | String | Yes |
-| `gender` | String | Yes |
-| `weight` | Double | Yes |
-| `birthDate` | LocalDate | Yes |
-| `neutered` | Boolean | Yes |
+| `nome` | String | Sim |
+| `especie` | String | Sim |
+| `sexo` | String | Sim |
+| `peso` | Double | Sim |
+| `dataNascimento` | LocalDate | Sim |
+| `castrado` | Boolean | Sim |
 
-**Response (201 Created):**
+**Resposta (201 Created):**
 ```json
 {
   "id": "uuid",
-  "name": "string",
-  "species": "string",
-  "gender": "string",
-  "weight": 5.5,
-  "birthDate": "2023-01-01",
-  "neutered": false
+  "nome": "string",
+  "especie": "string",
+  "sexo": "string",
+  "peso": 5.5,
+  "dataNascimento": "2023-01-01",
+  "castrado": false
 }
 ```
 
@@ -541,33 +541,33 @@ Adds a new pet to a client.
 
 #### GET `/api/pets/{id}`
 
-Retrieves a pet by ID.
+Busca um pet pelo ID.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `PetResponse` (same structure as above)
+**Resposta (200 OK):** `PetResponse` (mesma estrutura acima)
 
 ---
 
 #### DELETE `/api/pets/{id}`
 
-Deletes a pet (soft delete).
+Remove um pet (soft delete).
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
-### 7. Veterinario (`/api/veterinarios`)
+### 7. Veterinário (`/api/veterinarios`)
 
 #### GET `/api/veterinarios`
 
-Lists all veterinarians.
+Lista todos os veterinários.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):**
+**Resposta (200 OK):**
 ```json
 [
   {
@@ -583,51 +583,51 @@ Lists all veterinarians.
 
 #### GET `/api/veterinarios/{id}`
 
-Retrieves a veterinarian by ID.
+Busca um veterinário pelo ID.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `VeterinarioResponse` (same structure as above)
+**Resposta (200 OK):** `VeterinarioResponse` (mesma estrutura acima)
 
 ---
 
 #### POST `/api/veterinarios`
 
-Creates a new veterinarian.
+Cria um novo veterinário.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required |
+| Campo | Tipo | Obrigatório |
 |---|---|---|
-| `name` | String | Yes |
-| `crmv` | String | Yes |
-| `specialtyIds` | Set<UUID> | No |
+| `nome` | String | Sim |
+| `crmv` | String | Sim |
+| `especialidadeIds` | Set<UUID> | Não |
 
-**Response (201 Created):** `VeterinarioResponse`
+**Resposta (201 Created):** `VeterinarioResponse`
 
 ---
 
 #### PUT `/api/veterinarios/{id}`
 
-Updates a veterinarian.
+Atualiza um veterinário.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:** Same as POST `/api/veterinarios`
+**Corpo da Requisição:** Mesmo do POST `/api/veterinarios`
 
-**Response (200 OK):** Updated `VeterinarioResponse`
+**Resposta (200 OK):** `VeterinarioResponse` atualizado
 
 ---
 
 #### DELETE `/api/veterinarios/{id}`
 
-Deletes a veterinarian.
+Remove um veterinário.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
@@ -635,16 +635,16 @@ Deletes a veterinarian.
 
 #### GET `/api/especialidades`
 
-Lists all specialties.
+Lista todas as especialidades.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):**
+**Resposta (200 OK):**
 ```json
 [
   {
     "id": "uuid",
-    "name": "string"
+    "nome": "string"
   }
 ]
 ```
@@ -653,174 +653,174 @@ Lists all specialties.
 
 #### GET `/api/especialidades/{id}`
 
-Retrieves a specialty by ID.
+Busca uma especialidade pelo ID.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `EspecialidadeResponse` (same structure as above)
+**Resposta (200 OK):** `EspecialidadeResponse` (mesma estrutura acima)
 
 ---
 
 #### POST `/api/especialidades`
 
-Creates a new specialty.
+Cria uma nova especialidade.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:**
+**Corpo da Requisição:**
 
-| Field | Type | Required |
+| Campo | Tipo | Obrigatório |
 |---|---|---|
-| `name` | String | Yes |
+| `nome` | String | Sim |
 
-**Response (201 Created):** `EspecialidadeResponse`
+**Resposta (201 Created):** `EspecialidadeResponse`
 
 ---
 
 #### PUT `/api/especialidades/{id}`
 
-Updates a specialty.
+Atualiza uma especialidade.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:** Same as POST `/api/especialidades`
+**Corpo da Requisição:** Mesmo do POST `/api/especialidades`
 
-**Response (200 OK):** Updated `EspecialidadeResponse`
+**Resposta (200 OK):** `EspecialidadeResponse` atualizado
 
 ---
 
 #### DELETE `/api/especialidades/{id}`
 
-Deletes a specialty.
+Remove uma especialidade.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
-### 9. Endereco (`/api/enderecos`)
+### 9. Endereço (`/api/enderecos`)
 
-Global address management endpoints.
+Endpoints de gerenciamento global de endereços.
 
 #### GET `/api/enderecos`
 
-Lists all addresses in the system.
+Lista todos os endereços do sistema.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `List<EnderecoResponse>`
+**Resposta (200 OK):** `List<EnderecoResponse>`
 
 ---
 
 #### GET `/api/enderecos/{id}`
 
-Retrieves an address by ID.
+Busca um endereço pelo ID.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `EnderecoResponse`
+**Resposta (200 OK):** `EnderecoResponse`
 
 ---
 
 #### PUT `/api/enderecos/{id}`
 
-Updates an address.
+Atualiza um endereço.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:** Same fields as POST `/api/clientes/{id}/enderecos`
+**Corpo da Requisição:** Mesmos campos do POST `/api/clientes/{id}/enderecos`
 
-**Response (200 OK):** Updated `EnderecoResponse`
+**Resposta (200 OK):** `EnderecoResponse` atualizado
 
 ---
 
 #### DELETE `/api/enderecos/{id}`
 
-Deletes an address.
+Remove um endereço.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
 ### 10. Telefone (`/api/telefones`)
 
-Global phone number management endpoints.
+Endpoints de gerenciamento global de telefones.
 
 #### GET `/api/telefones`
 
-Lists all phone numbers in the system.
+Lista todos os telefones do sistema.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `List<TelefoneResponse>`
+**Resposta (200 OK):** `List<TelefoneResponse>`
 
 ---
 
 #### GET `/api/telefones/{id}`
 
-Retrieves a phone number by ID.
+Busca um telefone pelo ID.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (200 OK):** `TelefoneResponse`
+**Resposta (200 OK):** `TelefoneResponse`
 
 ---
 
 #### PUT `/api/telefones/{id}`
 
-Updates a phone number.
+Atualiza um telefone.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Request Body:** Same fields as POST `/api/clientes/{id}/telefones`
+**Corpo da Requisição:** Mesmos campos do POST `/api/clientes/{id}/telefones`
 
-**Response (200 OK):** Updated `TelefoneResponse`
+**Resposta (200 OK):** `TelefoneResponse` atualizado
 
 ---
 
 #### DELETE `/api/telefones/{id}`
 
-Deletes a phone number.
+Remove um telefone.
 
-**Auth:** Required (JWT)
+**Autenticação:** Requerida (JWT)
 
-**Response (204 No Content)**
+**Resposta (204 No Content)**
 
 ---
 
-## Summary Table
+## Tabela Resumo
 
-| Controller | Base Path | Auth | Endpoints |
+| Controller | Caminho Base | Autenticação | Endpoints |
 |---|---|---|---|
-| Auth | `/api/auth` | None | `POST /registro`, `POST /login` |
+| Auth | `/api/auth` | Nenhuma | `POST /registro`, `POST /login` |
 | Agendamento | `/api/agendamentos` | JWT | `POST /`, `GET /{id}`, `GET /cliente/{clienteId}`, `DELETE /{id}` |
 | Cliente | `/api/clientes` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
-| Clinica | `/api/clinicas` | JWT | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
-| Servico | `/api/servicos` | None | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}` |
+| Clínica | `/api/clinicas` | JWT | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
+| Serviço | `/api/servicos` | Nenhuma | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}` |
 | Pet | `/api/pets` | JWT | `POST /cliente/{clienteId}`, `GET /{id}`, `DELETE /{id}` |
-| Veterinario | `/api/veterinarios` | JWT | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}` |
+| Veterinário | `/api/veterinarios` | JWT | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}` |
 | Especialidade | `/api/especialidades` | JWT | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}` |
-| Endereco | `/api/enderecos` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
+| Endereço | `/api/enderecos` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
 | Telefone | `/api/telefones` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
 
-**Total: 47 endpoints** across 10 controllers.
+**Total: 47 endpoints** em 10 controllers.
 
 ---
 
-## Error Handling
+## Tratamento de Erros
 
-The application currently returns generic `500 Internal Server Error` for unhandled exceptions. Error messages are returned as plain text strings.
+A aplicação atualmente retorna `500 Internal Server Error` genérico para exceções não tratadas. As mensagens de erro são retornadas como texto puro.
 
 ---
 
-## Tech Stack
+## Stack Tecnológica
 
-- **Java 21** with Records for DTOs
+- **Java 21** com Records para DTOs
 - **Spring Boot 4.0.5**
-- **Spring Data JPA** with PostgreSQL
-- **Spring Security** with JWT (jjwt 0.12.6)
+- **Spring Data JPA** com PostgreSQL
+- **Spring Security** com JWT (jjwt 0.12.6)
 - **Lombok** (@Data, @Builder, @RequiredArgsConstructor, @UtilityClass)
 - **Bean Validation** (Hibernate Validator)

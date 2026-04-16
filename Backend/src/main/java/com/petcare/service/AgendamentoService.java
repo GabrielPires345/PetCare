@@ -1,5 +1,6 @@
 package com.petcare.service;
 
+import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.AgendamentoMapper;
 import com.petcare.mapper.request.AgendamentoRequest;
 import com.petcare.mapper.response.AgendamentoResponse;
@@ -14,7 +15,7 @@ import com.petcare.repository.ClinicaRepository;
 import com.petcare.repository.PetRepository;
 import com.petcare.repository.ServicoRepository;
 import com.petcare.repository.VeterinarioRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +36,13 @@ public class AgendamentoService {
     @Transactional
     public AgendamentoResponse agendar(AgendamentoRequest request) {
         Pet pet = petRepository.findById(request.petId())
-                .orElseThrow(() -> new RuntimeException("Pet not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pet não encontrado"));
         Clinica clinica = clinicaRepository.findById(request.clinicaId())
-                .orElseThrow(() -> new RuntimeException("Clinica not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Clínica não encontrada"));
         Veterinario veterinario = veterinarioRepository.findById(request.veterinarioId())
-                .orElseThrow(() -> new RuntimeException("Veterinario not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Veterinário não encontrado"));
         Servico servico = servicoRepository.findById(request.servicoId())
-                .orElseThrow(() -> new RuntimeException("Servico not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Serviço não encontrado"));
 
         Agendamento agendamento = AgendamentoMapper.toAgendamento(request, pet, clinica, veterinario, servico);
         Agendamento saved = agendamentoRepository.save(agendamento);
@@ -50,7 +51,7 @@ public class AgendamentoService {
 
     public AgendamentoResponse getById(UUID id) {
         Agendamento agendamento = agendamentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Agendamento not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Agendamento não encontrado"));
         return AgendamentoMapper.toAgendamentoResponse(agendamento);
     }
 
@@ -64,8 +65,14 @@ public class AgendamentoService {
     @Transactional
     public void cancelar(UUID id) {
         Agendamento agendamento = agendamentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Agendamento not found"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Agendamento não encontrado"));
         agendamento.setStatus(StatusAgendamento.CANCELADO);
         agendamentoRepository.save(agendamento);
+    }
+
+    public List<AgendamentoResponse> getAll() {
+        return agendamentoRepository.findAll().stream()
+                .map(AgendamentoMapper::toAgendamentoResponse)
+                .collect(Collectors.toList());
     }
 }

@@ -42,4 +42,10 @@ public class AgendamentoController {
         agendamentoService.cancelar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping
+    public ResponseEntity<List<AgendamentoResponse>> getAll() {
+        List<AgendamentoResponse> responses = agendamentoService.getAll();
+        return ResponseEntity.ok(responses);
+    }
 }

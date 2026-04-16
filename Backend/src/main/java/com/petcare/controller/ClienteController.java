@@ -71,7 +71,7 @@ public class ClienteController {
     @PostMapping("/{id}/telefones")
     public ResponseEntity<TelefoneResponse> adicionarTelefone(
             @PathVariable UUID id,
-            @RequestBody TelefoneRequest telefoneRequest) {
+            @Valid @RequestBody TelefoneRequest telefoneRequest) {
         TelefoneResponse telefone = telefoneService.criarTelefoneParaCliente(id, telefoneRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(telefone);
     }
