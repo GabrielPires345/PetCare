@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn test:*)",
+      "Bash(./mvnw test:*)",
+      "Bash(mvn compile:*)",
+      "Bash(./mvnw compile:*)"
+    ]
+  }
+}

@@ -28,9 +28,14 @@ public class Usuario {
     @Email
     private String email;
 
+    @Column(name = "username", nullable = false, unique = true, length = 10)
+    @NotBlank
+    @Size(max = 10, message = "Nome de usuário deve ter no máximo 10 caracteres")
+    private String nomeUsuario;
+
     @Column(name = "password_hash", nullable = false)
     @NotBlank
-    private String passwordHash;
+    private String senhaHash;
 
     @Column(name = "nivel_acesso", nullable = false)
     @NotBlank

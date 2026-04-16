@@ -39,8 +39,9 @@ public class Agendamento {
     @Column(name = "data_hora_marcada", nullable = false)
     private LocalDateTime dataHoraMarcada;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private StatusAgendamento status;
 
     @Column(name = "valor_final", nullable = false)
     private BigDecimal valorFinal;
