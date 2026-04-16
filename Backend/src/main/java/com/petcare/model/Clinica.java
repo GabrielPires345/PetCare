@@ -26,9 +26,9 @@ public class Clinica {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @Column(name = "nome_fantasia", nullable = false)
+    @Column(name = "nome_clinica", nullable = false)
     @NotBlank
-    private String nomeFantasia;
+    private String nomeClinica;
 
     @Column(name = "razao_social", nullable = false)
     @NotBlank

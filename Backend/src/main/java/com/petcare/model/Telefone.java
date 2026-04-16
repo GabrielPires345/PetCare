@@ -32,6 +32,6 @@ public class Telefone {
     @Column(name = "numero", nullable = false)
     private String numero;
 
-    @Column(name = "is_whatsapp", nullable = false)
-    private Boolean isWhatsApp;
+    @Column(name = "whatsapp", nullable = false)
+    private Boolean whatsapp;
 }
