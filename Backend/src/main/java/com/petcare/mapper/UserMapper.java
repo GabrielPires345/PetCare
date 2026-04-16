@@ -11,14 +11,15 @@ public class UserMapper {
     public static Usuario toUser(UserRequest userRequest){
         return Usuario.builder()
                 .email(userRequest.email())
-                .passwordHash(userRequest.password()) // Note: In real app, password should be hashed
-                .nivelAcesso("CLIENTE") // Default role, can be adjusted based on context
+                .senhaHash(userRequest.senha()) // Note: In real app, password should be hashed
+                .nivelAcesso(userRequest.nivelAcesso())
                 .build();
     }
 
     public static UserResponse toUserResponse(Usuario user){
         return UserResponse.builder()
                 .id(user.getId())
+                .nomeUsuario(user.getNomeUsuario())
                 .email(user.getEmail())
                 .nivelAcesso(user.getNivelAcesso())
                 .build();

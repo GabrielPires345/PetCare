@@ -3,6 +3,7 @@ package com.petcare.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +26,7 @@ public class Servico {
     private String descricao;
 
     @Column(name = "preco_base", nullable = false)
-    private Double precoBase;
+    private BigDecimal precoBase;
 
     @Column(name = "duracao_minutos", nullable = false)
     private Integer duracaoMinutos;

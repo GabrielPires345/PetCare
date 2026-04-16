@@ -23,11 +23,13 @@ public class HistoricoStatus {
     @JoinColumn(name = "agendamento_id", nullable = false)
     private Agendamento agendamento;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status_anterior", nullable = false)
-    private String statusAnterior;
+    private StatusAgendamento statusAnterior;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status_novo", nullable = false)
-    private String statusNovo;
+    private StatusAgendamento statusNovo;
 
     @ManyToOne
     @JoinColumn(name = "usuario_responsavel_id", nullable = false)

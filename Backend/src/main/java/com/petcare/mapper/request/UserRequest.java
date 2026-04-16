@@ -7,13 +7,13 @@ import lombok.Builder;
 @Builder
 public record UserRequest(
     @NotBlank(message = "O campo email é obrigatório")
-    @Email(message = "O campo email deve ter formato de email.")
+    @Email(message = "O campo email deve ter um formato válido")
     String email,
 
-    @NotBlank(message = "O campo password é obrigatório")
-    String password,
+    @NotBlank(message = "O campo senha é obrigatório")
+    String senha,
 
-    @NotBlank(message = "O campo nivel_acesso é obrigatório")
+    @NotBlank(message = "O campo nível de acesso é obrigatório")
     String nivelAcesso
 ) {
 }

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs ls:*)",
+      "Bash(mvn compile:*)",
+      "Bash(find \"C:\\\\Users\\\\Joao\\\\Documents\\\\PetCare\\\\Backend\\\\src\\\\main\\\\java\" -name \"*.java\" -type f -exec grep -l \"PetResponse\" {})",
+      "Bash(xargs grep:*)",
+      "Bash(sed 's/\\\\.java$//')"
+    ]
+  }
+}

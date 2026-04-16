@@ -1,6 +1,7 @@
 package com.petcare.mapper.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.util.Set;
@@ -11,7 +12,7 @@ public record VeterinarioRequest(
     @NotBlank(message = "O campo nome é obrigatório")
     String nome,
 
-    @NotBlank(message = "O campo crmv é obrigatório")
+    @NotBlank(message = "O campo CRMV é obrigatório")
     String crmv,
 
     Set<UUID> especialidadeIds

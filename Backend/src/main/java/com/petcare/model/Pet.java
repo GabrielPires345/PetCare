@@ -37,14 +37,14 @@ public class Pet {
     @Column(name = "sexo", nullable = false)
     private String sexo;
 
-    @Column(name = "peso_atual", nullable = false)
-    private Double pesoAtual;
+    @Column(name = "peso", nullable = false)
+    private Double peso;
 
     @Column(name = "data_nascimento", nullable = false)
     private LocalDate dataNascimento;
 
-    @Column(name = "is_castrado", nullable = false)
-    private Boolean isCastrado;
+    @Column(name = "castrado", nullable = false)
+    private Boolean castrado;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
