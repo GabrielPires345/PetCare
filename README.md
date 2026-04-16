@@ -80,6 +80,7 @@ erDiagram
     USUARIO {
         UUID id_usuario PK
         STRING email
+        STRING username
         STRING password_hash
         STRING nivel_acesso
         DATETIME created_at
@@ -93,6 +94,7 @@ erDiagram
         STRING nome_completo
         STRING cpf
         DATE data_nascimento
+        DATETIME deleted_at
     }
 
     VETERINARIO {
@@ -103,9 +105,9 @@ erDiagram
     }
 
     CLINICA_VETERINARIO {
+        UUID id PK
         UUID clinica_id FK
         UUID veterinario_id FK
-        DATETIME data_vinculo
     }
 
     ESPECIALIDADE {
@@ -116,15 +118,15 @@ erDiagram
     CLINICA {
         UUID id_clinica PK
         UUID usuario_id FK
-        STRING nome_fantasia
+        STRING nome_clinica
         STRING razao_social
         STRING cnpj
     }
 
     ENDERECO {
         UUID id_endereco PK
-        UUID cliente_id FK "nullable"
-        UUID clinica_id FK "nullable"
+        UUID cliente_id FK
+        UUID clinica_id FK
         STRING logradouro
         STRING numero
         STRING bairro
@@ -135,11 +137,11 @@ erDiagram
 
     TELEFONE {
         UUID id_telefone PK
-        UUID cliente_id FK "nullable"
-        UUID clinica_id FK "nullable"
+        UUID cliente_id FK
+        UUID clinica_id FK
         STRING ddd
         STRING numero
-        BOOLEAN is_whatsapp
+        BOOLEAN whatsapp
     }
 
     PET {
@@ -148,9 +150,9 @@ erDiagram
         STRING nome
         STRING especie
         STRING sexo
-        DECIMAL peso_atual
+        DOUBLE peso
         DATE data_nascimento
-        BOOLEAN is_castrado
+        BOOLEAN castrado
         DATETIME deleted_at
     }
 
@@ -161,7 +163,7 @@ erDiagram
         UUID veterinario_id FK
         UUID servico_id FK
         DATETIME data_hora_marcada
-        STRING status
+        ENUM status
         DECIMAL valor_final
     }
 
@@ -176,8 +178,8 @@ erDiagram
     HISTORICO_STATUS {
         UUID id PK
         UUID agendamento_id FK
-        STRING status_anterior
-        STRING status_novo
+        ENUM status_anterior
+        ENUM status_novo
         UUID usuario_responsavel_id FK
         DATETIME created_at
     }
