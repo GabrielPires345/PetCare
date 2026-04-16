@@ -1,0 +1,178 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+
+body {
+    font-family: 'Baloo 2', sans-serif, Arial;
+    background-color: #FDF6F0;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+form {
+    background-color: #fff;
+    padding: 2rem 3rem;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    margin-bottom: 4rem;
+    margin-top: 30%;
+    margin-left: 90%;
+}
+form input {
+    border: 3px solid #0099FF;
+}
+h1 {
+    text-align: center;
+    margin-top: 6rem;
+    color: #00BCD4;
+    font-size: 45px;
+}
+
+form h2 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: #00BCD4;
+}
+
+form label {
+    font-size: 1rem;
+    color: #555555;
+    margin-bottom: 0.3rem;
+    display: block;
+    font-weight: bold;
+}
+
+form input[type="email"],
+form input[type="password" ] {
+    width: 100%;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ff9061;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-shadow:  0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+form input[type="submit"] {
+    width: 60%;
+    padding: 0.8rem;
+    background-color: #FF8651;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 20%;
+}
+
+form input[type="submit"]:hover {
+    background-color: #ff9061;
+}
+
+form p {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 1.3rem;
+    margin-top: 10%;
+}
+
+form a {
+    color:  #FF5757;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.3rem;
+}
+
+.architects-daughter-regular {
+    font-family: "Architects Daughter", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.seta_posicao{
+    position: absolute;
+}
+
+footer {
+   display: flex; 
+   align-items: center;
+   justify-content: space-around;
+   background-color: #8B8B8B;
+   color: white;
+   text-align: center;
+   height: 8%;
+   margin-left: 0%;
+   width: 100%;
+   position: fixed;
+   top: 93%;
+   font-family: 'Baloo 2', sans-serif, Arial;
+   font-weight: bold;
+}
+
+.retangulo_laranja {
+    font-size: 125%;
+    width: 40%;
+    height: 100%;
+    background: #FFE8C7;
+    position: absolute;
+    margin-top: -2%;
+    margin-left: -1%;
+    text-align: center;
+    color: #f0f0f0;
+  }
+
+  .texto_banner {
+    font-family: 'Baloo 2', sans-serif, Arial;
+    font-weight: bold;
+    width: 26%;
+    margin-left: 6%;
+    margin-top: 2.5%;
+    position: absolute;
+    color:  #505050;
+    font-size: 1.5rem;
+    
+}
+
+/*
+
+/////  Nota (codigo abaixo): eu não tenho ideia porque a imagem quebra ao diminuir o tamanho ta tela  /////
+
+*/
+
+.imagem_logo_principal {
+    width: 18%;
+    margin-left: 64.5%;
+    margin-top: 2%;
+    position: absolute;
+}
+
+.imagem_banner {
+    width: 26%;
+    margin-left: 4%;
+    margin-top: 2.5%;
+    position: absolute;
+}
+
+
+
+/*
+
+/////  Nota (codigo abaixo): isso era para ser a linha, mas eu não consegui fazer funcionar  /////
+
+hr {
+    border: none;
+    height: 1px;
+    background-color: #B6B6B6;
+}
+
+*/

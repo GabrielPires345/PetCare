@@ -1,3 +1,85 @@
-body{
-    background:#FDF6F0;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Baloo 2', sans-serif, Arial;
+    background-color: #FDF6F0;
+}
+
+/* LAYOUT */
+.login-layout {
+    display: flex;
+    min-height: calc(100vh - 68px);
+}
+
+/* BANNER */
+.banner {
+    width: 40%;
+    background: #FFE8C7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* FORM */
+.form-area {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+form {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* TEXTOS */
+form h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #00BCD4;
+}
+
+form label {
+    font-weight: bold;
+    color: #555;
+}
+
+/* LINKS */
+.helpers {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.helpers a {
+    color: #FF5757;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    .login-layout {
+        flex-direction: column;
+    }
+
+    .banner {
+        width: 100%;
+        height: 200px;
+    }
+
+    .form-area {
+        width: 100%;
+        padding: 2rem 1rem;
+    }
 }

@@ -1,0 +1,43 @@
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border-light);
+    height: 68px;
+    padding: 0 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo-wordmark {
+    font-family: var(--fnt-head);
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: var(--navy-dark);
+}
+
+.logo-wordmark span {
+    color: var(--orange);
+}
+
+nav a {
+    font-weight: 500;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+nav a:hover {
+    color: var(--orange);
+}
