@@ -1,6 +1,45 @@
-*{
-    box-shadow: none;
-    padding: 0;
-    margin: 0;
+.home-page {
+    background-color: #FDF6F0;
+    font-family: 'Baloo 2', sans-serif, Arial;
 }
 
+.home-page__hero {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+}
+
+.home-page__content {
+    max-width: 700px;
+}
+
+/* BADGE */
+.home-page__badge {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.home-page__dot {
+    width: 8px;
+    height: 8px;
+    background-color: #FF9E74;
+    border-radius: 50%;
+}
+
+/* TÍTULO */
+.home-page__title {
+    font-size: 2.5rem;
+    color: #1A2A35;
+    line-height: 1.2;
+}
+
+.home-page__accent {
+    color: #FF9E74;
+}
+
+/* DESCRIÇÃO */
+.home-page__description {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+}

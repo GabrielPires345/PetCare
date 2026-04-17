@@ -1,14 +1,33 @@
 .footer-custom {
-    background: #1A2A35FF;
+    background: #1A2A35;
     padding: 60px 6% 30px;
 }
 
-.footer-top {
+/* evita conflito com outras .row/.footer-top do projeto */
+.footer-custom__top {
     margin-bottom: 48px;
 }
 
-.footer-brand p,
-.logo-wordmark{
+.footer-custom__brand {
+    color: white;
+}
+
+.footer-custom__icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.footer-custom__logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-left: 8px;
+}
+
+.footer-custom__logo span {
+    color: #FF9E74;
+}
+
+.footer-custom__text {
     font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.45);
     line-height: 1.7;

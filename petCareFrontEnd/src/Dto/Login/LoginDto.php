@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Dto;
+namespace App\Dto\Login;
 
-class UserRegisterDto
+class LoginDto
 {
     private mixed $email;
     private mixed $password;
@@ -11,7 +11,6 @@ class UserRegisterDto
         $this->email = $data['email'] ?? null;
         $this->password = $data['password'] ?? null;
     }
-
 
     public function getEmail(): string
     {

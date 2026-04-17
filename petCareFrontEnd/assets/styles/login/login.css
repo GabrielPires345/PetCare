@@ -1,85 +1,69 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.login-page {
+    background-color: #FDF6F0;
+    font-family: 'Baloo 2', sans-serif, Arial;
 }
 
-body {
-    font-family: 'Baloo 2', sans-serif, Arial;
+.login-page__banner {
     background-color: #FDF6F0;
 }
 
-/* LAYOUT */
-.login-layout {
-    display: flex;
-    min-height: calc(100vh - 68px);
+.login-page__banner-title {
+    color: #FF9E74;
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 700;
 }
 
-/* BANNER */
-.banner {
-    width: 40%;
-    background: #FFE8C7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
+.login-page__content {
+    padding: 1rem;
 }
 
-/* FORM */
-.form-area {
-    width: 60%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-form {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
+.login-page__form {
     max-width: 400px;
+    border: 0;
+    margin: 0;
 }
 
-/* TEXTOS */
-form h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #00BCD4;
+.login-page__title {
+    color: #FF9E74;
+    font-weight: 700;
 }
 
-form label {
+/* Customização SEM quebrar Bootstrap */
+.login-page .form-control {
+    border: 1px solid #ff9061;
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.12);
+}
+
+.login-page .form-control:focus {
+    border-color: #0099FF;
+    box-shadow: 0 0 0 0.2rem rgba(0, 153, 255, 0.15);
+}
+
+.login-page__button {
+    background-color: #FF9E74;
+    border: none;
+    border-radius: 15px;
     font-weight: bold;
-    color: #555;
+    padding: 0.9rem;
 }
 
-/* LINKS */
-.helpers {
-    text-align: center;
-    margin-top: 1rem;
+.login-page__button:hover {
+    background-color: rgb(251, 167, 131);
 }
 
-.helpers a {
+.login-page__link {
     color: #FF5757;
     font-weight: bold;
-    text-decoration: none;
 }
 
-/* RESPONSIVO */
-@media (max-width: 768px) {
-    .login-layout {
-        flex-direction: column;
-    }
+.login-page__link:hover {
+    color: #e14a4a;
+}
 
-    .banner {
-        width: 100%;
-        height: 200px;
-    }
-
-    .form-area {
-        width: 100%;
-        padding: 2rem 1rem;
+@media (max-width: 767.98px) {
+    .login-page__form {
+        max-width: 100%;
     }
 }

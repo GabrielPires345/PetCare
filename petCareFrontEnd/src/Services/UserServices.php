@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Dto\UserRegisterDto;
+use App\Dto\Cadastro\ClienteCadastroDto;
 
 class UserServices
 {
-    public function validateForm(UserRegisterDto $dto): bool
+    public function validateForm(ClienteCadastroDto $dto): bool
     {
         if (empty($dto->getEmail()) || empty($dto->getPassword()) || $this->isStrongPassword($dto->getPassword())) {
             return false;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Login;
 
-use App\Dto\UserRegisterDto;
+use App\Dto\Cadastro\ClienteCadastroDto;
 use App\Services\UserServices;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,17 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class HomeController extends AbstractController
+final class LoginController extends AbstractController
 {
-    public function __construct(
-        private UserServices $userServices,
-        private HttpClientInterface $client
-    ) {}
 
-    #[Route('/home', name: 'app_home', methods: ['GET'])]
-    public function index(): Response
+    public function __construct(
+        private UserServices        $userServices,
+        private HttpClientInterface $client
+    )
     {
-        return $this->render('landing_page/index.html.twig');
     }
 
     #[Route('/login/form', name: 'app_login_form', methods: ['GET'])]
@@ -35,21 +32,9 @@ final class HomeController extends AbstractController
         return $this->handleUserRequest($request);
     }
 
-    #[Route('/cadastro/form', name: 'app_cadastro_form', methods: ['POST'])]
-    public function cadastro(Request $request): Response
-    {
-        return $this->handleUserRequest($request);
-    }
-
-    #[Route('/update', name: 'app_update', methods: ['POST'])]
-    public function update(): Response
-    {
-        return $this->render('login/index.html.twig');
-    }
-
     private function handleUserRequest(Request $request): Response
     {
-        $dto = new UserRegisterDto($request->request->all());
+        $dto = new ClienteCadastroDto($request->request->all());
 
         if (!$this->userServices->validateForm($dto)) {
             return $this->redirectToRoute('app_login');
@@ -72,12 +57,12 @@ final class HomeController extends AbstractController
             ];
         }
 
-        return $this->render('login/index.html.twig', [
+        return $this->render('login/telaPosLogin.html.twig.twig', [
             'response' => $data
         ]);
     }
 
-    private function parseData(UserRegisterDto $dto): array
+    private function parseData(ClienteCadastroDto $dto): array
     {
         return [
             'email' => $dto->getEmail(),

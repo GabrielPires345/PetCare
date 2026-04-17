@@ -1,0 +1,135 @@
+{% extends 'components/base.html.twig' %}
+
+{% block title %}PetCare – Cadastro{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/cadastroUser/cadastroUser.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid p-0 cadastro-page">
+        <div class="row g-0 min-vh-100">
+
+            <!-- BANNER -->
+            <div class="col-md-5 d-none d-md-flex align-items-center justify-content-center cadastro-page__banner">
+                <div class="text-center px-4">
+                    <img class="cadastro-page__logo img-fluid"
+                         src="{{ asset('img/CadastroUserimg/logo.png') }}"
+                         alt="Logo Principal">
+
+                    <h3 class="cadastro-page__banner-title">
+                        “É cuidar do bem estar <br> do seu pet”
+                    </h3>
+                </div>
+            </div>
+
+            <!-- FORM -->
+            <div class="col-12 col-md-7 d-flex align-items-center justify-content-center cadastro-page__content">
+
+                <form method="POST" action="#" class="cadastro-page__form bg-white rounded shadow-sm w-100 p-4">
+
+                    <div class="mb-3">
+                        <a href="{{ path('app_login_form') }}" class="cadastro-page__back-link text-decoration-none">
+                            Voltar
+                        </a>
+                    </div>
+
+                    <h2 class="text-center mb-4 cadastro-page__title">Cadastrar Usuário</h2>
+
+                    <!-- DADOS BASE -->
+                    <div class="mb-3">
+                        <label class="form-label">Nome de usuário</label>
+                        <input type="text" name="user_name" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Senha</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Confirmar senha</label>
+                        <input type="password" name="password_confirmation" class="form-control" required>
+                    </div>
+
+                    <!-- TIPO -->
+                    <div class="mb-4">
+                        <label class="form-label">Tipo de conta</label>
+                        <select name="nivel_acesso" id="nivel_acesso" class="form-control" required>
+                            <option value="">Selecione</option>
+                            <option value="CLIENTE">Cliente</option>
+                            <option value="VETERINARIO">Veterinário</option>
+                            <option value="CLINICA">Clínica</option>
+                        </select>
+                    </div>
+
+                    <!-- PERFIS -->
+                    <div class="perfil perfil-cliente d-none">
+                        <h5>Dados do Cliente</h5>
+                        <input type="text" name="nome_completo" class="form-control mb-2" placeholder="Nome completo">
+                        <input type="text" name="cpf" class="form-control mb-2" placeholder="CPF">
+                        <input type="date" name="data_nascimento" class="form-control mb-3">
+                    </div>
+
+                    <div class="perfil perfil-veterinario d-none">
+                        <h5>Dados do Veterinário</h5>
+                        <input type="text" name="nome_vet" class="form-control mb-2" placeholder="Nome">
+                        <input type="text" name="crmv" class="form-control mb-3" placeholder="CRMV">
+                    </div>
+
+                    <div class="perfil perfil-clinica d-none">
+                        <h5>Dados da Clínica</h5>
+                        <input type="text" name="nome_clinica" class="form-control mb-2" placeholder="Nome da clínica">
+                        <input type="text" name="razao_social" class="form-control mb-2" placeholder="Razão social">
+                        <input type="text" name="cnpj" class="form-control mb-3" placeholder="CNPJ">
+                    </div>
+
+                    <!-- CONTATO -->
+                    <h5 class="mt-4">Contato</h5>
+                    <input type="text" name="ddd" class="form-control mb-2" placeholder="DDD">
+                    <input type="text" name="telefone" class="form-control mb-3" placeholder="Número">
+
+                    <!-- ENDEREÇO -->
+                    <h5 class="mt-4">Endereço</h5>
+                    <input type="text" name="cep" class="form-control mb-2" placeholder="CEP">
+                    <input type="text" name="cidade" class="form-control mb-2" placeholder="Cidade">
+                    <input type="text" name="uf" class="form-control mb-3" placeholder="UF">
+
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        Continuar
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        const select = document.getElementById('nivel_acesso');
+
+        if (select) {
+            select.addEventListener('change', function () {
+                document.querySelectorAll('.perfil').forEach(el => el.classList.add('d-none'));
+
+                if (this.value === 'CLIENTE') {
+                    document.querySelector('.perfil-cliente')?.classList.remove('d-none');
+                }
+
+                if (this.value === 'VETERINARIO') {
+                    document.querySelector('.perfil-veterinario')?.classList.remove('d-none');
+                }
+
+                if (this.value === 'CLINICA') {
+                    document.querySelector('.perfil-clinica')?.classList.remove('d-none');
+                }
+            });
+        }
+    </script>
+{% endblock %}
