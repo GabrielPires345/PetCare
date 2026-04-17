@@ -35,6 +35,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // Se usar cookies:
+        //http.csrf(csrf -> csrf
+                //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
