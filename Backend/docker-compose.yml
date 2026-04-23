@@ -1,4 +1,4 @@
-1services:
+services:
   postgres:
     image: postgres:16
     container_name: petcare-postgres
@@ -10,6 +10,17 @@
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: petcare-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@petcare.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
 
   mailhog:
     image: mailhog/mailhog

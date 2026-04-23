@@ -9,8 +9,7 @@ Aplicação Spring Boot 4.0.5 que fornece uma API REST para a plataforma PetCare
 Para executar o projeto, você precisa ter instalado:
 - Java 21
 - Maven 3.8+
-- PostgreSQL (para ambiente de produção)
-- Docker (para rodar o MailHog — verificação de email)
+- Docker (para rodar PostgreSQL, pgAdmin e MailHog)
 
 ## Acesso à Documentação
 
@@ -19,22 +18,78 @@ A documentação da API está disponível através do Swagger UI:
 - **Interface:** http://localhost:8080/swagger-ui.html
 - **JSON da API:** http://localhost:8080/api-docs
 
-### H2 Console
-Para acesso ao banco de dados em ambiente de desenvolvimento:
+### H2 Console (desenvolvimento local — padrão)
+Para acesso ao banco de dados em memória quando rodando pelo IntelliJ sem Docker:
 - **Console:** http://localhost:8080/h2-console
 - **JDBC URL:** jdbc:h2:mem:petcare
 - **Usuário:** sa
 - **Senha:** (vazia)
 
-### MailHog (Verificação de Email)
-Para o fluxo de verificação de email funcionar localmente, inicie o MailHog via Docker:
+### pgAdmin (PostgreSQL via Docker)
+Interface visual para o banco PostgreSQL, disponível quando os containers estão ativos:
+- **URL:** http://localhost:5050
+- **Email:** admin@petcare.com
+- **Senha:** admin
+
+**Conexão ao servidor PostgreSQL no pgAdmin:**
+- Clique em "Add New Server"
+- **General → Name:** PetCare
+- **Connection → Host:** postgres (nome do container)
+- **Connection → Port:** 5432
+- **Connection → Username:** postgres
+- **Connection → Password:** postgres
+
+---
+
+## Docker (Infraestrutura)
+
+O projeto possui um `docker-compose.yml` com os serviços necessários para rodar a aplicação com PostgreSQL e verificação de email.
+
+### Serviços disponíveis
+
+| Serviço | Container | Portas | Descrição |
+|---|---|---|---|
+| PostgreSQL | petcare-postgres | 5432 | Banco de dados relacional |
+| pgAdmin | petcare-pgadmin | 5050 → 80 | Interface visual do PostgreSQL |
+| MailHog | petcare-mailhog | 1025, 8025 | Servidor SMTP de teste + Web UI |
+
+### Comandos
 
 ```bash
-docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+# Subir todos os serviços
+docker compose up -d
+
+# Subir apenas o MailHog (para usar com H2 no IntelliJ)
+docker compose up -d mailhog
+
+# Subir PostgreSQL + MailHog (sem pgAdmin)
+docker compose up -d postgres mailhog
+
+# Parar todos os serviços
+docker compose down
+
+# Parar e remover volumes (apaga dados do PostgreSQL)
+docker compose down -v
 ```
 
-- **SMTP:** localhost:1025 (usado pela aplicação para enviar emails)
-- **Web UI:** http://localhost:8025 (onde você visualiza os emails recebidos)
+### Perfis do Spring Boot
+
+A aplicação utiliza Spring Profiles para alternar entre H2 e PostgreSQL:
+
+| Cenário | Docker | Profile no IntelliJ | Banco |
+|---|---|---|---|
+| Desenvolvimento local | `docker compose up -d mailhog` | *(vazio — padrão)* | H2 em memória |
+| Com PostgreSQL | `docker compose up -d` | `postgres` | PostgreSQL |
+| Sem email | nenhum | *(vazio)* | H2 em memória |
+
+#### Como ativar o profile "postgres" no IntelliJ
+
+1. Vá em **Run → Edit Configurations**
+2. Selecione a configuração do Spring Boot
+3. No campo **Active profiles**, digite: `postgres`
+4. Clique em **Apply** e **Run**
+
+Quando o profile `postgres` está ativo, o Spring carrega o `application-postgres.properties` que sobrescreve as configurações do H2 com as do PostgreSQL (localhost:5432). Sem o profile, o H2 é usado automaticamente.
 
 ## Guia de Autenticação
 
@@ -928,7 +983,7 @@ Remove um telefone.
 
 | Controller | Caminho Base | Autenticação | Endpoints |
 |---|---|---|---|
-| Auth | `/api/auth` | Nenhuma | `POST /registro`, `POST /login` |
+| Auth | `/api/auth` | Nenhuma | `POST /registro`, `POST /login`, `GET /verificar-email`, `POST /reenviar-verificacao` |
 | Agendamento | `/api/agendamentos` | JWT | `POST /`, `GET /`, `GET /{id}`, `GET /cliente/{clienteId}`, `DELETE /{id}` |
 | Cliente | `/api/clientes` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
 | Clínica | `/api/clinicas` | JWT | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
@@ -939,7 +994,7 @@ Remove um telefone.
 | Endereço | `/api/enderecos` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
 | Telefone | `/api/telefones` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
 
-**Total: 48 endpoints** em 10 controllers.
+**Total: 50 endpoints** em 10 controllers.
 
 ---
 
