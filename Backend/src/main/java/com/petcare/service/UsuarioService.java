@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public boolean existsByEmail(String email) {
         return usuarioRepository.findByEmail(email).isPresent();
@@ -40,9 +43,13 @@ public class UsuarioService {
                 .email(dto.email())
                 .senhaHash(passwordEncoder.encode(dto.senha()))
                 .nivelAcesso("CLIENTE")
+                .emailVerificado(false)
+                .tokenVerificacao(UUID.randomUUID().toString())
                 .build();
 
-        return usuarioRepository.save(usuario);
+        usuario = usuarioRepository.save(usuario);
+        emailService.enviarEmailVerificacao(usuario.getEmail(), usuario.getTokenVerificacao());
+        return usuario;
     }
 
     public UserResponse getUsuarioById(UUID id) {
@@ -74,5 +81,30 @@ public class UsuarioService {
             throw new RecursoNaoEncontradoException("Usuário não encontrado");
         }
         usuarioRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void verificarEmail(String token) {
+        Usuario usuario = usuarioRepository.findByTokenVerificacao(token)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Token de verificação inválido"));
+
+        usuario.setEmailVerificado(true);
+        usuario.setTokenVerificacao(null);
+        usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void reenviarVerificacao(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
+
+        if (Boolean.TRUE.equals(usuario.getEmailVerificado())) {
+            throw new RecursoDuplicadoException("Email já verificado");
+        }
+
+        String novoToken = UUID.randomUUID().toString();
+        usuario.setTokenVerificacao(novoToken);
+        usuarioRepository.save(usuario);
+        emailService.enviarEmailVerificacao(usuario.getEmail(), novoToken);
     }
 }
