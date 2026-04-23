@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: petcare-postgres
+    environment:
+      POSTGRES_DB: petcare
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - petcare-net
+
+  pgadmin:
+    image: dpage/pgadmin4:8.6
+    container_name: petcare-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@petcare.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - petcare-net
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: petcare-mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - petcare-net
+
+networks:
+  petcare-net:
+    driver: bridge
+
+volumes:
+  postgres-data:

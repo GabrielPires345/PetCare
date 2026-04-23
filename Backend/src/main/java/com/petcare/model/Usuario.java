@@ -41,6 +41,13 @@ public class Usuario {
     @NotBlank
     private String nivelAcesso;
 
+    @Column(name = "email_verificado", nullable = false)
+    @Builder.Default
+    private Boolean emailVerificado = false;
+
+    @Column(name = "token_verificacao")
+    private String tokenVerificacao;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -9,7 +9,7 @@ Aplicação Spring Boot 4.0.5 que fornece uma API REST para a plataforma PetCare
 Para executar o projeto, você precisa ter instalado:
 - Java 21
 - Maven 3.8+
-- PostgreSQL (para ambiente de produção)
+- Docker (para rodar PostgreSQL, pgAdmin e MailHog)
 
 ## Acesso à Documentação
 
@@ -18,28 +18,102 @@ A documentação da API está disponível através do Swagger UI:
 - **Interface:** http://localhost:8080/swagger-ui.html
 - **JSON da API:** http://localhost:8080/api-docs
 
-### H2 Console
-Para acesso ao banco de dados em ambiente de desenvolvimento:
+### H2 Console (desenvolvimento local — padrão)
+Para acesso ao banco de dados em memória quando rodando pelo IntelliJ sem Docker:
 - **Console:** http://localhost:8080/h2-console
 - **JDBC URL:** jdbc:h2:mem:petcare
 - **Usuário:** sa
 - **Senha:** (vazia)
 
+### pgAdmin (PostgreSQL via Docker)
+Interface visual para o banco PostgreSQL, disponível quando os containers estão ativos:
+- **URL:** http://localhost:5050
+- **Email:** admin@petcare.com
+- **Senha:** admin
+
+**Conexão ao servidor PostgreSQL no pgAdmin:**
+- Clique em "Add New Server"
+- **General → Name:** PetCare
+- **Connection → Host:** postgres (nome do container)
+- **Connection → Port:** 5432 (interna do container, não 5433)
+- **Connection → Username:** postgres
+- **Connection → Password:** postgres
+
+---
+
+## Docker (Infraestrutura)
+
+O projeto possui um `docker-compose.yml` com os serviços necessários para rodar a aplicação com PostgreSQL e verificação de email.
+
+### Serviços disponíveis
+
+| Serviço | Container | Portas | Descrição |
+|---|---|---|---|
+| PostgreSQL | petcare-postgres | 5433 → 5432 | Banco de dados relacional |
+| pgAdmin | petcare-pgadmin | 5050 → 80 | Interface visual do PostgreSQL |
+| MailHog | petcare-mailhog | 1025, 8025 | Servidor SMTP de teste + Web UI |
+
+### Comandos
+
+```bash
+# Subir todos os serviços
+docker compose up -d
+
+# Subir apenas o MailHog (para usar com H2 no IntelliJ)
+docker compose up -d mailhog
+
+# Subir PostgreSQL + MailHog (sem pgAdmin)
+docker compose up -d postgres mailhog
+
+# Parar todos os serviços
+docker compose down
+
+# Parar e remover volumes (apaga dados do PostgreSQL)
+docker compose down -v
+```
+
+### Perfis do Spring Boot
+
+A aplicação utiliza Spring Profiles para alternar entre H2 e PostgreSQL:
+
+| Cenário | Docker | Profile no IntelliJ | Banco |
+|---|---|---|---|
+| Desenvolvimento local | `docker compose up -d mailhog` | `h2` *(padrão automático)* | H2 em memória |
+| Com PostgreSQL | `docker compose up -d` | `postgres` | PostgreSQL |
+| Sem email | nenhum | `h2` *(padrão automático)* | H2 em memória |
+
+#### Como ativar o profile "postgres" no IntelliJ
+
+1. Vá em **Run → Edit Configurations**
+2. Selecione a configuração do Spring Boot
+3. No campo **Active profiles**, digite: `postgres`
+4. Clique em **Apply** e **Run**
+
+Quando o profile `postgres` está ativo, o Spring carrega o `application-postgres.properties` que configura a conexão com o PostgreSQL (localhost:5432) e desabilita o console do H2. Sem o profile (ou com o profile padrão `h2`), o banco em memória é usado automaticamente — ideal para rodar direto pelo IntelliJ sem Docker.
+
 ## Guia de Autenticação
 
 Para acessar os endpoints protegidos da API, é necessário obter um token JWT:
 
-1. **Obter token via endpoint de login:**
+1. **Registrar-se:**
+   - **POST** `/api/auth/registro`
+   - A conta é criada, mas o email precisa ser verificado antes do login
+
+2. **Verificar email:**
+   - Acesse o MailHog em http://localhost:8025 e clique no link de verificação
+   - Ou acesse diretamente: **GET** `/api/auth/verificar-email?token=<token>`
+
+3. **Obter token via endpoint de login:**
    - **POST** `/api/auth/login`
    - Envie email e senha no corpo da requisição
-   - O token será retornado na resposta
+   - O token será retornado na resposta (apenas se o email estiver verificado)
 
-2. **Usar token no Swagger UI:**
+4. **Usar token no Swagger UI:**
    - Clique no botão "Authorize" (ícone de cadeado no canto superior direito)
    - Insira: `Bearer <seu-token-jwt>`
    - Clique em "Authorize"
 
-3. **Usar token em requisições:**
+5. **Usar token em requisições:**
    - Adicione o header: `Authorization: Bearer <seu-token-jwt>`
 
 ## Autenticação
@@ -60,7 +134,7 @@ Authorization: Bearer <seu-token-jwt>
 
 #### POST `/api/auth/registro`
 
-Registra um novo cliente (cria Usuário + Perfil de Cliente + Pet). Retorna um token JWT.
+Registra um novo cliente (cria Usuário + Perfil de Cliente + Pet). Um email de verificação é enviado via MailHog. O login só é possível após verificar o email.
 
 **Autenticação:** Não requerida
 
@@ -91,18 +165,64 @@ Registra um novo cliente (cria Usuário + Perfil de Cliente + Pet). Retorna um t
 **Resposta (201 Created):**
 ```json
 {
-  "user": {
-    "id": "uuid",
-    "nomeUsuario": "string",
-    "email": "string",
-    "nivelAcesso": "CLIENTE"
-  },
-  "token": "eyJhbGci..."
+  "mensagem": "Registro realizado com sucesso. Verifique seu email para ativar sua conta.",
+  "email": "usuario@email.com"
 }
 ```
 
 **Resposta (400 Bad Request):**
 - `"As senhas não conferem"` se `senha` != `confirmaSenha`
+
+---
+
+#### GET `/api/auth/verificar-email`
+
+Verifica o email do usuário através do token enviado por email. Após a verificação, o usuário pode fazer login.
+
+**Autenticação:** Não requerida
+
+**Parâmetros de Query:**
+
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| `token` | String | Sim |
+
+**Resposta (200 OK):**
+```json
+{
+  "mensagem": "Email verificado com sucesso! Você já pode fazer login."
+}
+```
+
+**Resposta (404 Not Found):**
+- `"Token de verificação inválido"` se o token não existir ou já foi usado
+
+---
+
+#### POST `/api/auth/reenviar-verificacao`
+
+Reenvia o email de verificação para um endereço específico. Gera um novo token.
+
+**Autenticação:** Não requerida
+
+**Corpo da Requisição:**
+
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| `email` | String | Sim |
+
+**Resposta (200 OK):**
+```json
+{
+  "mensagem": "Email de verificação reenviado com sucesso."
+}
+```
+
+**Resposta (404 Not Found):**
+- `"Usuário não encontrado"` se o email não estiver cadastrado
+
+**Resposta (409 Conflict):**
+- `"Email já verificado"` se o email já foi verificado
 
 ---
 
@@ -134,6 +254,14 @@ Autentica um usuário e retorna um token JWT.
 ```
 
 **Resposta (401 Unauthorized):** `"Invalid credentials"`
+
+**Resposta (401 Unauthorized — Email não verificado):**
+```json
+{
+  "code": "EMAIL_NAO_VERIFICADO",
+  "message": "Email ainda não verificado. Verifique sua caixa de entrada."
+}
+```
 
 ---
 
@@ -855,7 +983,7 @@ Remove um telefone.
 
 | Controller | Caminho Base | Autenticação | Endpoints |
 |---|---|---|---|
-| Auth | `/api/auth` | Nenhuma | `POST /registro`, `POST /login` |
+| Auth | `/api/auth` | Nenhuma | `POST /registro`, `POST /login`, `GET /verificar-email`, `POST /reenviar-verificacao` |
 | Agendamento | `/api/agendamentos` | JWT | `POST /`, `GET /`, `GET /{id}`, `GET /cliente/{clienteId}`, `DELETE /{id}` |
 | Cliente | `/api/clientes` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
 | Clínica | `/api/clinicas` | JWT | `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}`, `POST /{id}/enderecos`, `GET /{id}/enderecos`, `POST /{id}/telefones`, `GET /{id}/telefones` |
@@ -866,7 +994,7 @@ Remove um telefone.
 | Endereço | `/api/enderecos` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
 | Telefone | `/api/telefones` | JWT | `GET /`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` |
 
-**Total: 48 endpoints** em 10 controllers.
+**Total: 50 endpoints** em 10 controllers.
 
 ---
 
