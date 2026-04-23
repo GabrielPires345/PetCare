@@ -75,6 +75,7 @@ class AuthControllerTest {
                 .nomeUsuario("testeuser")
                 .senhaHash("hash")
                 .nivelAcesso("CLIENTE")
+                .emailVerificado(true)
                 .build();
 
         cliente = Cliente.builder()
@@ -114,15 +115,13 @@ class AuthControllerTest {
     @DisplayName("Deve registrar cliente com sucesso quando senhas conferem")
     void deveRegistrarClienteComSucesso() {
         when(usuarioService.criarUsuarioParaNovoCliente(any(ClienteCreateRequest.class))).thenReturn(usuario);
-        when(clienteRepository.findByUsuarioId(any(UUID.class))).thenReturn(Optional.of(cliente));
-        when(jwtUtil.generateToken(any(UUID.class), any(String.class))).thenReturn("token-jwt");
 
         ResponseEntity<Map<String, Object>> response = authController.registrarCliente(clienteCreateRequest);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody().containsKey("token"));
-        assertTrue(response.getBody().containsKey("user"));
+        assertTrue(response.getBody().containsKey("mensagem"));
+        assertTrue(response.getBody().containsKey("email"));
 
         verify(usuarioService).criarUsuarioParaNovoCliente(any(ClienteCreateRequest.class));
         verify(clienteService).registrarNovoCliente(any(ClienteCreateRequest.class), any(Usuario.class));
@@ -166,15 +165,31 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Deve propagar RecursoNaoEncontradoException quando cliente não encontrado após registro")
-    void devePropagarRecursoNaoEncontradoExceptionAposRegistro() {
-        when(usuarioService.criarUsuarioParaNovoCliente(any(ClienteCreateRequest.class))).thenReturn(usuario);
-        when(clienteRepository.findByUsuarioId(any(UUID.class))).thenReturn(Optional.empty());
+    @DisplayName("Deve lançar AutenticacaoException quando login com email não verificado")
+    void deveLancarAutenticacaoExceptionQuandoEmailNaoVerificado() {
+        Usuario usuarioNaoVerificado = Usuario.builder()
+                .id(UUID.randomUUID())
+                .email("naoVerificado@email.com")
+                .nomeUsuario("user")
+                .senhaHash("hash")
+                .nivelAcesso("CLIENTE")
+                .emailVerificado(false)
+                .build();
 
-        assertThrows(
-                RecursoNaoEncontradoException.class,
-                () -> authController.registrarCliente(clienteCreateRequest)
+        Authentication authentication = mock(Authentication.class);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+        when(usuarioRepository.findByEmail(any(String.class))).thenReturn(Optional.of(usuarioNaoVerificado));
+
+        LoginRequest loginNaoVerificado = new LoginRequest("naoVerificado@email.com", "senha123");
+
+        AutenticacaoException ex = assertThrows(
+                AutenticacaoException.class,
+                () -> authController.fazerLogin(loginNaoVerificado)
         );
+
+        assertEquals(ErrorCode.EMAIL_NAO_VERIFICADO, ex.getErrorCode());
+        verify(jwtUtil, never()).generateToken(any(), any());
     }
 
     // ==================== Login ====================
