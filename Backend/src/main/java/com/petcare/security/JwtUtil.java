@@ -23,10 +23,10 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateToken(UUID clienteId, String email) {
+    public String generateToken(UUID perfilId, String email) {
         return Jwts.builder()
                 .subject(email)
-                .claim("clienteId", clienteId.toString())
+                .claim("perfilId", perfilId.toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -41,9 +41,9 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    public UUID getClienteIdFromToken(String token) {
+    public UUID getPerfilIdFromToken(String token) {
         Claims claims = parseToken(token);
-        return UUID.fromString(claims.get("clienteId", String.class));
+        return UUID.fromString(claims.get("perfilId", String.class));
     }
 
     public String getEmailFromToken(String token) {

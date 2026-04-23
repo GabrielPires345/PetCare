@@ -2,6 +2,7 @@ package com.petcare.service;
 
 import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.VeterinarioMapper;
+import com.petcare.mapper.request.VeterinarioCreateRequest;
 import com.petcare.mapper.request.VeterinarioRequest;
 import com.petcare.mapper.response.VeterinarioResponse;
 import com.petcare.model.Especialidade;
@@ -53,6 +54,26 @@ public class VeterinarioService {
 
         Veterinario veterinario = VeterinarioMapper.toVeterinario(request, especialidadeRepository);
         veterinario.setUsuario(usuario);
+
+        Veterinario saved = veterinarioRepository.save(veterinario);
+        return VeterinarioMapper.toVeterinarioResponse(saved);
+    }
+
+    @Transactional
+    public VeterinarioResponse registrarNovoVeterinario(VeterinarioCreateRequest dto, Usuario usuario) {
+        Veterinario veterinario = Veterinario.builder()
+                .usuario(usuario)
+                .nome(dto.nome())
+                .crmv(dto.crmv())
+                .build();
+
+        if (dto.especialidadeIds() != null && !dto.especialidadeIds().isEmpty()) {
+            Set<Especialidade> especialidades = dto.especialidadeIds().stream()
+                    .map(id -> especialidadeRepository.findById(id)
+                            .orElseThrow(() -> new RecursoNaoEncontradoException("Especialidade não encontrada: " + id)))
+                    .collect(Collectors.toSet());
+            veterinario.setEspecialidades(especialidades);
+        }
 
         Veterinario saved = veterinarioRepository.save(veterinario);
         return VeterinarioMapper.toVeterinarioResponse(saved);

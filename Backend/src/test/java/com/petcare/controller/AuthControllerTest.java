@@ -11,10 +11,14 @@ import com.petcare.mapper.request.PetRequest;
 import com.petcare.model.Cliente;
 import com.petcare.model.Usuario;
 import com.petcare.repository.ClienteRepository;
+import com.petcare.repository.ClinicaRepository;
 import com.petcare.repository.UsuarioRepository;
+import com.petcare.repository.VeterinarioRepository;
 import com.petcare.security.JwtUtil;
+import com.petcare.service.ClinicaService;
 import com.petcare.service.ClienteService;
 import com.petcare.service.UsuarioService;
+import com.petcare.service.VeterinarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,10 +52,22 @@ class AuthControllerTest {
     private ClienteRepository clienteRepository;
 
     @Mock
+    private ClinicaRepository clinicaRepository;
+
+    @Mock
+    private VeterinarioRepository veterinarioRepository;
+
+    @Mock
     private UsuarioService usuarioService;
 
     @Mock
     private ClienteService clienteService;
+
+    @Mock
+    private ClinicaService clinicaService;
+
+    @Mock
+    private VeterinarioService veterinarioService;
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -210,7 +226,8 @@ class AuthControllerTest {
         assertNotNull(response.getBody());
         assertTrue(response.getBody().containsKey("token"));
         assertTrue(response.getBody().containsKey("user"));
-        assertTrue(response.getBody().containsKey("clienteId"));
+        assertTrue(response.getBody().containsKey("perfilId"));
+        assertTrue(response.getBody().containsKey("tipoPerfil"));
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(usuarioRepository).findByEmail(loginRequest.email());
@@ -246,8 +263,8 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Deve lançar RecursoNaoEncontradoException quando cliente não encontrado após autenticação")
-    void deveLancarRecursoNaoEncontradoExceptionQuandoClienteNaoEncontrado() {
+    @DisplayName("Deve lançar RecursoNaoEncontradoException quando perfil não encontrado após autenticação")
+    void deveLancarRecursoNaoEncontradoExceptionQuandoPerfilNaoEncontrado() {
         Authentication authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
@@ -272,6 +289,6 @@ class AuthControllerTest {
 
         authController.fazerLogin(loginRequest);
 
-        verify(jwtUtil).generateToken(usuario.getId(), usuario.getEmail());
+        verify(jwtUtil).generateToken(cliente.getId(), usuario.getEmail());
     }
 }
