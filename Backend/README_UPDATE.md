@@ -10,6 +10,7 @@ Para executar o projeto, você precisa ter instalado:
 - Java 21
 - Maven 3.8+
 - PostgreSQL (para ambiente de produção)
+- Docker (para rodar o MailHog — verificação de email)
 
 ## Acesso à Documentação
 
@@ -25,21 +26,39 @@ Para acesso ao banco de dados em ambiente de desenvolvimento:
 - **Usuário:** sa
 - **Senha:** (vazia)
 
+### MailHog (Verificação de Email)
+Para o fluxo de verificação de email funcionar localmente, inicie o MailHog via Docker:
+
+```bash
+docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+```
+
+- **SMTP:** localhost:1025 (usado pela aplicação para enviar emails)
+- **Web UI:** http://localhost:8025 (onde você visualiza os emails recebidos)
+
 ## Guia de Autenticação
 
 Para acessar os endpoints protegidos da API, é necessário obter um token JWT:
 
-1. **Obter token via endpoint de login:**
+1. **Registrar-se:**
+   - **POST** `/api/auth/registro`
+   - A conta é criada, mas o email precisa ser verificado antes do login
+
+2. **Verificar email:**
+   - Acesse o MailHog em http://localhost:8025 e clique no link de verificação
+   - Ou acesse diretamente: **GET** `/api/auth/verificar-email?token=<token>`
+
+3. **Obter token via endpoint de login:**
    - **POST** `/api/auth/login`
    - Envie email e senha no corpo da requisição
-   - O token será retornado na resposta
+   - O token será retornado na resposta (apenas se o email estiver verificado)
 
-2. **Usar token no Swagger UI:**
+4. **Usar token no Swagger UI:**
    - Clique no botão "Authorize" (ícone de cadeado no canto superior direito)
    - Insira: `Bearer <seu-token-jwt>`
    - Clique em "Authorize"
 
-3. **Usar token em requisições:**
+5. **Usar token em requisições:**
    - Adicione o header: `Authorization: Bearer <seu-token-jwt>`
 
 ## Autenticação
@@ -60,7 +79,7 @@ Authorization: Bearer <seu-token-jwt>
 
 #### POST `/api/auth/registro`
 
-Registra um novo cliente (cria Usuário + Perfil de Cliente + Pet). Retorna um token JWT.
+Registra um novo cliente (cria Usuário + Perfil de Cliente + Pet). Um email de verificação é enviado via MailHog. O login só é possível após verificar o email.
 
 **Autenticação:** Não requerida
 
@@ -91,18 +110,64 @@ Registra um novo cliente (cria Usuário + Perfil de Cliente + Pet). Retorna um t
 **Resposta (201 Created):**
 ```json
 {
-  "user": {
-    "id": "uuid",
-    "nomeUsuario": "string",
-    "email": "string",
-    "nivelAcesso": "CLIENTE"
-  },
-  "token": "eyJhbGci..."
+  "mensagem": "Registro realizado com sucesso. Verifique seu email para ativar sua conta.",
+  "email": "usuario@email.com"
 }
 ```
 
 **Resposta (400 Bad Request):**
 - `"As senhas não conferem"` se `senha` != `confirmaSenha`
+
+---
+
+#### GET `/api/auth/verificar-email`
+
+Verifica o email do usuário através do token enviado por email. Após a verificação, o usuário pode fazer login.
+
+**Autenticação:** Não requerida
+
+**Parâmetros de Query:**
+
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| `token` | String | Sim |
+
+**Resposta (200 OK):**
+```json
+{
+  "mensagem": "Email verificado com sucesso! Você já pode fazer login."
+}
+```
+
+**Resposta (404 Not Found):**
+- `"Token de verificação inválido"` se o token não existir ou já foi usado
+
+---
+
+#### POST `/api/auth/reenviar-verificacao`
+
+Reenvia o email de verificação para um endereço específico. Gera um novo token.
+
+**Autenticação:** Não requerida
+
+**Corpo da Requisição:**
+
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| `email` | String | Sim |
+
+**Resposta (200 OK):**
+```json
+{
+  "mensagem": "Email de verificação reenviado com sucesso."
+}
+```
+
+**Resposta (404 Not Found):**
+- `"Usuário não encontrado"` se o email não estiver cadastrado
+
+**Resposta (409 Conflict):**
+- `"Email já verificado"` se o email já foi verificado
 
 ---
 
@@ -134,6 +199,14 @@ Autentica um usuário e retorna um token JWT.
 ```
 
 **Resposta (401 Unauthorized):** `"Invalid credentials"`
+
+**Resposta (401 Unauthorized — Email não verificado):**
+```json
+{
+  "code": "EMAIL_NAO_VERIFICADO",
+  "message": "Email ainda não verificado. Verifique sua caixa de entrada."
+}
+```
 
 ---
 
