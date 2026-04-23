@@ -25,6 +25,7 @@ class UsuarioServiceTest {
 
     @Mock private UsuarioRepository usuarioRepository;
     @Mock private PasswordEncoder passwordEncoder;
+    @Mock private EmailService emailService;
     @InjectMocks private UsuarioService usuarioService;
 
     @BeforeEach
