@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface VeterinarioRepository extends JpaRepository<Veterinario, UUID> {
     Optional<Veterinario> findByCrmv(String crmv);
+    Optional<Veterinario> findByUsuarioId(UUID usuarioId);
 }
