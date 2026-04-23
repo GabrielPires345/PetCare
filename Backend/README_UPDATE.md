@@ -35,7 +35,7 @@ Interface visual para o banco PostgreSQL, disponível quando os containers estã
 - Clique em "Add New Server"
 - **General → Name:** PetCare
 - **Connection → Host:** postgres (nome do container)
-- **Connection → Port:** 5432
+- **Connection → Port:** 5432 (interna do container, não 5433)
 - **Connection → Username:** postgres
 - **Connection → Password:** postgres
 
@@ -49,7 +49,7 @@ O projeto possui um `docker-compose.yml` com os serviços necessários para roda
 
 | Serviço | Container | Portas | Descrição |
 |---|---|---|---|
-| PostgreSQL | petcare-postgres | 5432 | Banco de dados relacional |
+| PostgreSQL | petcare-postgres | 5433 → 5432 | Banco de dados relacional |
 | pgAdmin | petcare-pgadmin | 5050 → 80 | Interface visual do PostgreSQL |
 | MailHog | petcare-mailhog | 1025, 8025 | Servidor SMTP de teste + Web UI |
 
