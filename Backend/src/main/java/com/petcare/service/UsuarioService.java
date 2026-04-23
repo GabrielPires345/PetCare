@@ -4,6 +4,8 @@ import com.petcare.exception.RecursoDuplicadoException;
 import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.UserMapper;
 import com.petcare.mapper.request.ClienteCreateRequest;
+import com.petcare.mapper.request.ClinicaCreateRequest;
+import com.petcare.mapper.request.VeterinarioCreateRequest;
 import com.petcare.mapper.request.UserRequest;
 import com.petcare.mapper.response.UserResponse;
 import com.petcare.model.Usuario;
@@ -41,6 +43,46 @@ public class UsuarioService {
                 .email(dto.email())
                 .senhaHash(passwordEncoder.encode(dto.senha()))
                 .nivelAcesso("CLIENTE")
+                .emailVerificado(false)
+                .tokenVerificacao(UUID.randomUUID().toString())
+                .build();
+
+        usuario = usuarioRepository.save(usuario);
+        emailService.enviarEmailVerificacao(usuario.getEmail(), usuario.getTokenVerificacao());
+        return usuario;
+    }
+
+    @Transactional
+    public Usuario criarUsuarioParaNovaClinica(ClinicaCreateRequest dto) {
+        if (usuarioRepository.findByEmail(dto.email()).isPresent()) {
+            throw new RecursoDuplicadoException("Email já cadastrado");
+        }
+
+        Usuario usuario = Usuario.builder()
+                .nomeUsuario(dto.nomeUsuario())
+                .email(dto.email())
+                .senhaHash(passwordEncoder.encode(dto.senha()))
+                .nivelAcesso("CLINICA")
+                .emailVerificado(false)
+                .tokenVerificacao(UUID.randomUUID().toString())
+                .build();
+
+        usuario = usuarioRepository.save(usuario);
+        emailService.enviarEmailVerificacao(usuario.getEmail(), usuario.getTokenVerificacao());
+        return usuario;
+    }
+
+    @Transactional
+    public Usuario criarUsuarioParaNovoVeterinario(VeterinarioCreateRequest dto) {
+        if (usuarioRepository.findByEmail(dto.email()).isPresent()) {
+            throw new RecursoDuplicadoException("Email já cadastrado");
+        }
+
+        Usuario usuario = Usuario.builder()
+                .nomeUsuario(dto.nomeUsuario())
+                .email(dto.email())
+                .senhaHash(passwordEncoder.encode(dto.senha()))
+                .nivelAcesso("VETERINARIO")
                 .emailVerificado(false)
                 .tokenVerificacao(UUID.randomUUID().toString())
                 .build();

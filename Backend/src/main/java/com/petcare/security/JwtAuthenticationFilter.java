@@ -1,5 +1,7 @@
 package com.petcare.security;
 
+import com.petcare.model.Usuario;
+import com.petcare.repository.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -20,6 +23,7 @@ import java.util.UUID;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -49,15 +53,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String email = jwtUtil.getEmailFromToken(token);
-        UUID clienteId = jwtUtil.getClienteIdFromToken(token);
+        UUID perfilId = jwtUtil.getPerfilIdFromToken(token);
+
+        String role = "ROLE_CLIENTE";
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isPresent()) {
+            role = "ROLE_" + usuarioOpt.get().getNivelAcesso();
+        }
 
         var auth = new UsernamePasswordAuthenticationToken(
                 email,
                 null,
-                List.of(new SimpleGrantedAuthority("ROLE_CLIENTE"))
+                List.of(new SimpleGrantedAuthority(role))
         );
         SecurityContextHolder.getContext().setAuthentication(auth);
-        request.setAttribute("clienteId", clienteId);
+        request.setAttribute("perfilId", perfilId);
 
         filterChain.doFilter(request, response);
     }

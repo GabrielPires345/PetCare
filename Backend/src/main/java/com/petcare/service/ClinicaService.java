@@ -2,6 +2,7 @@ package com.petcare.service;
 
 import com.petcare.exception.RecursoNaoEncontradoException;
 import com.petcare.mapper.ClinicaMapper;
+import com.petcare.mapper.request.ClinicaCreateRequest;
 import com.petcare.mapper.request.ClinicaRequest;
 import com.petcare.mapper.response.ClinicaResponse;
 import com.petcare.model.Clinica;
@@ -37,6 +38,19 @@ public class ClinicaService {
 
         Clinica clinica = ClinicaMapper.toClinica(clinicaRequest);
         clinica.setUsuario(usuario);
+
+        Clinica savedClinica = clinicaRepository.save(clinica);
+        return ClinicaMapper.toClinicaResponse(savedClinica);
+    }
+
+    @Transactional
+    public ClinicaResponse registrarNovaClinica(ClinicaCreateRequest dto, Usuario usuario) {
+        Clinica clinica = Clinica.builder()
+                .usuario(usuario)
+                .nomeClinica(dto.nomeClinica())
+                .razaoSocial(dto.razaoSocial())
+                .cnpj(dto.cnpj())
+                .build();
 
         Clinica savedClinica = clinicaRepository.save(clinica);
         return ClinicaMapper.toClinicaResponse(savedClinica);
