@@ -78,9 +78,9 @@ A aplicação utiliza Spring Profiles para alternar entre H2 e PostgreSQL:
 
 | Cenário | Docker | Profile no IntelliJ | Banco |
 |---|---|---|---|
-| Desenvolvimento local | `docker compose up -d mailhog` | *(vazio — padrão)* | H2 em memória |
+| Desenvolvimento local | `docker compose up -d mailhog` | `h2` *(padrão automático)* | H2 em memória |
 | Com PostgreSQL | `docker compose up -d` | `postgres` | PostgreSQL |
-| Sem email | nenhum | *(vazio)* | H2 em memória |
+| Sem email | nenhum | `h2` *(padrão automático)* | H2 em memória |
 
 #### Como ativar o profile "postgres" no IntelliJ
 
@@ -89,7 +89,7 @@ A aplicação utiliza Spring Profiles para alternar entre H2 e PostgreSQL:
 3. No campo **Active profiles**, digite: `postgres`
 4. Clique em **Apply** e **Run**
 
-Quando o profile `postgres` está ativo, o Spring carrega o `application-postgres.properties` que sobrescreve as configurações do H2 com as do PostgreSQL (localhost:5432). Sem o profile, o H2 é usado automaticamente.
+Quando o profile `postgres` está ativo, o Spring carrega o `application-postgres.properties` que configura a conexão com o PostgreSQL (localhost:5432) e desabilita o console do H2. Sem o profile (ou com o profile padrão `h2`), o banco em memória é usado automaticamente — ideal para rodar direto pelo IntelliJ sem Docker.
 
 ## Guia de Autenticação
 
