@@ -1,0 +1,163 @@
+{% extends 'components/base.html.twig' %}
+
+{% block title %}PetCare – Cadastro{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/cadastroUser/cadastroUser.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid p-0 cadastro-page">
+        <div class="row g-0 min-vh-100">
+
+            <!-- BANNER -->
+            <div class="col-md-5 d-none d-md-flex align-items-center justify-content-center cadastro-page__banner">
+                <div class="text-center px-4">
+                    <img class="cadastro-page__logo img-fluid"
+                         src="{{ asset('img/CadastroUserimg/logo.png') }}"
+                         alt="Logo Principal">
+
+                    <h3 class="cadastro-page__banner-title">
+                        "É cuidar do bem estar <br> do seu pet"
+                    </h3>
+                </div>
+            </div>
+
+            <!-- FORM -->
+            <div class="col-12 col-md-7 d-flex align-items-center justify-content-center cadastro-page__content">
+
+                <form method="POST" action="{{ path('app_cadastro') }}" class="cadastro-page__form bg-white rounded shadow-sm w-100 p-4">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('registration') }}">
+
+                    <div class="mb-3">
+                        <a href="{{ path('app_login_form') }}" class="cadastro-page__back-link text-decoration-none">
+                            Voltar
+                        </a>
+                    </div>
+
+                    <h2 class="text-center mb-4 cadastro-page__title">Cadastrar Usuário</h2>
+
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endfor %}
+
+                    {% for messages in app.flashes('fieldErrors') %}
+                        {% for msg in messages %}
+                            <div class="alert alert-warning py-1">{{ msg }}</div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    <!-- DADOS BASE -->
+                    <div class="mb-3">
+                        <label class="form-label">Nome de usuário</label>
+                        <input type="text" name="nomeUsuario" class="form-control" required maxlength="10">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Senha</label>
+                        <input type="password" name="senha" class="form-control" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Confirmar senha</label>
+                        <input type="password" name="confirmaSenha" class="form-control" required>
+                    </div>
+
+                    <!-- TIPO -->
+                    <div class="mb-4">
+                        <label class="form-label">Tipo de conta</label>
+                        <select name="nivelAcesso" id="nivelAcesso" class="form-control" required>
+                            <option value="">Selecione</option>
+                            <option value="CLIENTE">Cliente</option>
+                            <option value="VETERINARIO">Veterinário</option>
+                            <option value="CLINICA">Clínica</option>
+                        </select>
+                    </div>
+
+                    <!-- PERFIL CLIENTE -->
+                    <div class="perfil perfil-cliente d-none">
+                        <h5>Dados do Cliente</h5>
+                        <input type="text" name="nomeCompleto" class="form-control mb-2" placeholder="Nome completo" required>
+                        <input type="text" name="cpf" class="form-control mb-2" placeholder="CPF" required>
+                        <input type="date" name="dataNascimento" class="form-control mb-3" required>
+
+                        <h5>Dados do Pet</h5>
+                        <input type="text" name="pet[nome]" class="form-control mb-2" placeholder="Nome do pet">
+                        <input type="text" name="pet[especie]" class="form-control mb-2" placeholder="Espécie">
+                        <select name="pet[sexo]" class="form-control mb-2">
+                            <option value="">Sexo do pet</option>
+                            <option value="MACHO">Macho</option>
+                            <option value="FEMEA">Fêmea</option>
+                        </select>
+                        <input type="number" step="0.1" name="pet[peso]" class="form-control mb-2" placeholder="Peso (kg)">
+                        <input type="date" name="pet[dataNascimento]" class="form-control mb-2" placeholder="Nascimento do pet">
+                        <div class="form-check mb-3">
+                            <input type="checkbox" name="pet[castrado]" value="true" class="form-check-input" id="petCastrado">
+                            <label class="form-check-label" for="petCastrado">Castrado</label>
+                        </div>
+                    </div>
+
+                    <!-- PERFIL VETERINÁRIO -->
+                    <div class="perfil perfil-veterinario d-none">
+                        <h5>Dados do Veterinário</h5>
+                        <input type="text" name="nome" class="form-control mb-2" placeholder="Nome" required>
+                        <input type="text" name="crmv" class="form-control mb-3" placeholder="CRMV" required>
+                    </div>
+
+                    <!-- PERFIL CLÍNICA -->
+                    <div class="perfil perfil-clinica d-none">
+                        <h5>Dados da Clínica</h5>
+                        <input type="text" name="nomeClinica" class="form-control mb-2" placeholder="Nome da clínica" required>
+                        <input type="text" name="razaoSocial" class="form-control mb-2" placeholder="Razão social" required>
+                        <input type="text" name="cnpj" class="form-control mb-3" placeholder="CNPJ" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        Continuar
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        const select = document.getElementById('nivelAcesso');
+
+        if (select) {
+            select.addEventListener('change', function () {
+                document.querySelectorAll('.perfil').forEach(el => el.classList.add('d-none'));
+
+                // Remove required from all perfil fields
+                document.querySelectorAll('.perfil [required]').forEach(el => el.removeAttribute('required'));
+
+                if (this.value === 'CLIENTE') {
+                    const section = document.querySelector('.perfil-cliente');
+                    section?.classList.remove('d-none');
+                    section?.querySelectorAll('[data-cliente-required]').forEach(el => el.setAttribute('required', ''));
+                    // Add required back to cliente fields
+                    section?.querySelectorAll('input[name="nomeCompleto"], input[name="cpf"], input[name="dataNascimento"]').forEach(el => el.setAttribute('required', ''));
+                }
+
+                if (this.value === 'VETERINARIO') {
+                    const section = document.querySelector('.perfil-veterinario');
+                    section?.classList.remove('d-none');
+                    section?.querySelectorAll('input[name="nome"], input[name="crmv"]').forEach(el => el.setAttribute('required', ''));
+                }
+
+                if (this.value === 'CLINICA') {
+                    const section = document.querySelector('.perfil-clinica');
+                    section?.classList.remove('d-none');
+                    section?.querySelectorAll('input[name="nomeClinica"], input[name="razaoSocial"], input[name="cnpj"]').forEach(el => el.setAttribute('required', ''));
+                }
+            });
+        }
+    </script>
+{% endblock %}
