@@ -72,6 +72,7 @@ class RegistrationService
             confirmaSenha: $formData['confirmaSenha'] ?? null,
             nome: $formData['nome'] ?? null,
             crmv: $formData['crmv'] ?? null,
+            especialidadeIds: [],
         );
 
         if (!$dto->isValid()) {

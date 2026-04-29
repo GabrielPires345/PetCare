@@ -11,18 +11,21 @@ class VeterinarioRegistroDto
         private ?string $confirmaSenha,
         private ?string $nome,
         private ?string $crmv,
+        private array   $especialidadeIds = [],
     ) {}
 
     public function toArray(): array
     {
-        return array_filter([
+        $data = [
             'nomeUsuario' => $this->nomeUsuario,
             'email' => $this->email,
             'senha' => $this->senha,
             'confirmaSenha' => $this->confirmaSenha,
             'nome' => $this->nome,
             'crmv' => $this->crmv,
-        ], fn($v) => $v !== null);
+            'especialidadeIds' => $this->especialidadeIds,
+        ];
+        return array_filter($data, fn($v) => $v !== null);
     }
 
     public function isValid(): bool
