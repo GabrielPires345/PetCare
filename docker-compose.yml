@@ -1,0 +1,94 @@
+services:
+  # ---------- INFRAESTRUTURA ----------
+
+  postgres:
+    image: postgres:16
+    container_name: petcare-postgres
+    environment:
+      POSTGRES_DB: petcare
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - petcare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:8.6
+    container_name: petcare-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@petcare.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - petcare-net
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: petcare-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - petcare-net
+
+  # ---------- APLICAÇÕES ----------
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: petcare-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      APP_BASE_URL: http://localhost:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - petcare-net
+
+  frontend:
+    build:
+      context: ./petCareFrontEnd
+      dockerfile: Dockerfile
+    container_name: petcare-frontend
+    ports:
+      - "8000:80"
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: "1"
+      APP_SECRET: b749e3d83ad18e65aa70e5d03f95052b
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/petcare?serverVersion=16&charset=utf8"
+      BACKEND_API_URL: http://backend:8080
+      MAILER_DSN: "smtp://mailhog:1025"
+    depends_on:
+      - backend
+      - postgres
+    volumes:
+      - ./petCareFrontEnd/src:/var/www/html/src
+      - ./petCareFrontEnd/templates:/var/www/html/templates
+      - ./petCareFrontEnd/config:/var/www/html/config
+      - ./petCareFrontEnd/public:/var/www/html/public
+    networks:
+      - petcare-net
+
+volumes:
+  postgres-data:
+
+networks:
+  petcare-net:
+    driver: bridge

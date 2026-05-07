@@ -31,7 +31,7 @@ public class EmailService {
             helper.setTo(destinatario);
             helper.setSubject("PetCare - Verifique seu email");
 
-            String verificationLink = baseUrl + "/api/auth/verificar-email?token=" + token;
+            String verificationLink = baseUrl + "/verificar-email?token=" + token;
 
             String htmlContent = """
                 <!DOCTYPE html>

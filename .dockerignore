@@ -1,0 +1,11 @@
+Backend/target/
+Backend/.mvn/
+Backend/.idea/
+Backend/*.iml
+petCareFrontEnd/vendor/
+petCareFrontEnd/var/
+petCareFrontEnd/node_modules/
+petCareFrontEnd/.idea/
+.git
+*.md
+.gitignore

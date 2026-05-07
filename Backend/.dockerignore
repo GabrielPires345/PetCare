@@ -1,0 +1,11 @@
+target/
+.mvn/
+.idea/
+*.iml
+.git
+.gitignore
+README_UPDATE.md
+PetCareLogo.png
+docker-compose.yml
+Dockerfile
+.dockerignore

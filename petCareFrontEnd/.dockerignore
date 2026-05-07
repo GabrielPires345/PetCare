@@ -1,0 +1,16 @@
+vendor/
+var/
+node_modules/
+.idea/
+.git
+.gitignore
+.editorconfig
+tests/
+migrations/
+compose.yaml
+compose.override.yaml
+phpunit.dist.xml
+importmap.php
+Dockerfile
+.dockerignore
+.dockerignore
