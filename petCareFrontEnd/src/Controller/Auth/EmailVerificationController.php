@@ -19,7 +19,17 @@ final class EmailVerificationController extends AbstractController
     {
         $token = $request->query->get('token', '');
 
-        $this->authService->verifyEmail($token);
+        if (empty($token)) {
+            $this->addFlash('error', 'Token de verificação não informado.');
+            return $this->redirectToRoute('app_login_form');
+        }
+
+        try {
+            $this->authService->verifyEmail($token);
+        } catch (\Throwable $e) {
+            $this->addFlash('error', $e->getMessage());
+            return $this->redirectToRoute('app_login_form');
+        }
 
         $this->addFlash('success', 'Email verificado com sucesso! Você já pode fazer login.');
         return $this->redirectToRoute('app_login_form');

@@ -11,6 +11,7 @@ import com.petcare.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,6 +36,15 @@ public class PetService {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pet não encontrado"));
         return PetMapper.toPetResponse(pet);
+    }
+
+    public List<PetResponse> listarPetsPorCliente(UUID clienteId) {
+        if (!clienteRepository.existsById(clienteId)) {
+            throw new RecursoNaoEncontradoException("Cliente não encontrado");
+        }
+        return petRepository.findByCliente_Id(clienteId).stream()
+                .map(PetMapper::toPetResponse)
+                .toList();
     }
 
     public void deletePet(UUID petId) {

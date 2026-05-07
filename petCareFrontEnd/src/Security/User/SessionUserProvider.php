@@ -2,7 +2,7 @@
 
 namespace App\Security\User;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -10,13 +10,14 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class SessionUserProvider implements UserProviderInterface
 {
     public function __construct(
-        private SessionInterface $session,
+        private RequestStack $requestStack,
     ) {}
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        $userData = $this->session->get('user');
-        $jwt = $this->session->get('jwt_token');
+        $session = $this->requestStack->getSession();
+        $userData = $session->get('user');
+        $jwt = $session->get('jwt_token');
 
         if (!$userData || !$jwt) {
             throw new UserNotFoundException('No authenticated user in session.');
@@ -27,8 +28,8 @@ class SessionUserProvider implements UserProviderInterface
             nomeUsuario: $userData['nomeUsuario'] ?? '',
             email: $identifier,
             nivelAcesso: $userData['nivelAcesso'] ?? '',
-            perfilId: $this->session->get('perfilId', ''),
-            tipoPerfil: $this->session->get('tipoPerfil', ''),
+            perfilId: $session->get('perfilId', ''),
+            tipoPerfil: $session->get('tipoPerfil', ''),
             jwtToken: $jwt,
         );
     }

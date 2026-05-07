@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,6 +31,11 @@ public class PetController {
     public ResponseEntity<PetResponse> getPetById(@PathVariable UUID id) {
         PetResponse pet = petService.getPetById(id);
         return ResponseEntity.ok(pet);
+    }
+
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<PetResponse>> listarPetsPorCliente(@PathVariable UUID clienteId) {
+        return ResponseEntity.ok(petService.listarPetsPorCliente(clienteId));
     }
 
     @DeleteMapping("/{id}")

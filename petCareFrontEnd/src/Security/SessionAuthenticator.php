@@ -5,8 +5,8 @@ namespace App\Security;
 use App\Security\User\SessionUser;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -17,19 +17,22 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 class SessionAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
-        private SessionInterface $session,
+        private RequestStack $requestStack,
         private UrlGeneratorInterface $urlGenerator,
     ) {}
 
     public function supports(Request $request): ?bool
     {
-        return true;
+        // Only authenticate requests under /app (protected area)
+        // Other routes (login, register, home) should not trigger authentication
+        return str_starts_with($request->getPathInfo(), '/app');
     }
 
     public function authenticate(Request $request): SelfValidatingPassport
     {
-        $jwt = $this->session->get('jwt_token');
-        $userData = $this->session->get('user');
+        $session = $this->requestStack->getSession();
+        $jwt = $session->get('jwt_token');
+        $userData = $session->get('user');
 
         if (!$jwt || !$userData) {
             throw new AuthenticationException('No JWT token in session.');
@@ -38,14 +41,14 @@ class SessionAuthenticator extends AbstractAuthenticator
         $email = $userData['email'] ?? $userData['nomeUsuario'] ?? '';
 
         return new SelfValidatingPassport(
-            new UserBadge($email, function (string $email) use ($userData, $jwt) {
+            new UserBadge($email, function (string $email) use ($userData, $jwt, $session) {
                 return new SessionUser(
                     id: $userData['id'] ?? '',
                     nomeUsuario: $userData['nomeUsuario'] ?? '',
                     email: $email,
                     nivelAcesso: $userData['nivelAcesso'] ?? '',
-                    perfilId: $this->session->get('perfilId', ''),
-                    tipoPerfil: $this->session->get('tipoPerfil', ''),
+                    perfilId: $session->get('perfilId', ''),
+                    tipoPerfil: $session->get('tipoPerfil', ''),
                     jwtToken: $jwt,
                 );
             })

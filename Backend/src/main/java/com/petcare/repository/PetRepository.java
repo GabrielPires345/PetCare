@@ -4,10 +4,12 @@ import com.petcare.model.Pet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface PetRepository extends JpaRepository<Pet, UUID> {
     Optional<Pet> findByNomeAndCliente_Id(String nome, UUID clienteId);
+    List<Pet> findByCliente_Id(UUID clienteId);
 }

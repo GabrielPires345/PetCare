@@ -7,7 +7,7 @@ use App\Dto\Response\Auth\LoginResultDto;
 use App\Exception\AuthenticationException;
 use App\Exception\ValidationException;
 use App\Service\Api\BackendApiService;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AuthService
 {
@@ -18,7 +18,7 @@ class AuthService
 
     public function __construct(
         private BackendApiService $api,
-        private SessionInterface $session,
+        private RequestStack $requestStack,
     ) {}
 
     public function login(LoginRequestDto $dto): LoginResultDto
@@ -44,7 +44,7 @@ class AuthService
 
     public function logout(): void
     {
-        $this->session->invalidate();
+        $this->requestStack->getSession()->invalidate();
     }
 
     public function verifyEmail(string $token): void
@@ -65,34 +65,40 @@ class AuthService
 
     public function isAuthenticated(): bool
     {
-        return $this->session->has(self::SESSION_KEY_JWT);
+        return $this->requestStack->getSession()->has(self::SESSION_KEY_JWT);
     }
 
     public function getToken(): ?string
     {
-        return $this->session->get(self::SESSION_KEY_JWT);
+        return $this->requestStack->getSession()->get(self::SESSION_KEY_JWT);
     }
 
     public function getUser(): ?array
     {
-        return $this->session->get(self::SESSION_KEY_USER);
+        return $this->requestStack->getSession()->get(self::SESSION_KEY_USER);
     }
 
     public function getTipoPerfil(): ?string
     {
-        return $this->session->get(self::SESSION_KEY_TYPE);
+        return $this->requestStack->getSession()->get(self::SESSION_KEY_TYPE);
+    }
+
+    public function getPerfilId(): ?string
+    {
+        return $this->requestStack->getSession()->get(self::SESSION_KEY_PID);
     }
 
     private function persistSession(LoginResultDto $dto): void
     {
-        $this->session->set(self::SESSION_KEY_JWT, $dto->getToken());
-        $this->session->set(self::SESSION_KEY_USER, [
+        $session = $this->requestStack->getSession();
+        $session->set(self::SESSION_KEY_JWT, $dto->getToken());
+        $session->set(self::SESSION_KEY_USER, [
             'id' => $dto->getUserId(),
             'nomeUsuario' => $dto->getNomeUsuario(),
             'email' => $dto->getEmail(),
             'nivelAcesso' => $dto->getNivelAcesso(),
         ]);
-        $this->session->set(self::SESSION_KEY_PID, $dto->getPerfilId());
-        $this->session->set(self::SESSION_KEY_TYPE, $dto->getTipoPerfil());
+        $session->set(self::SESSION_KEY_PID, $dto->getPerfilId());
+        $session->set(self::SESSION_KEY_TYPE, $dto->getTipoPerfil());
     }
 }

@@ -27,12 +27,17 @@ final class LoginController extends AbstractController
     {
         $submittedToken = $request->request->get('_csrf_token', '');
         if (!$this->isCsrfTokenValid('authenticate', $submittedToken)) {
-            throw new ValidationException('Token CSRF inválido.');
+            $this->addFlash('error', 'Token de segurança inválido. Tente novamente.');
+            return $this->redirectToRoute('app_login_form');
         }
 
-        $dto = new LoginRequestDto($request->request->all());
-
-        $this->authService->login($dto);
+        try {
+            $dto = new LoginRequestDto($request->request->all());
+            $this->authService->login($dto);
+        } catch (\Throwable $e) {
+            $this->addFlash('error', $e->getMessage());
+            return $this->redirectToRoute('app_login_form');
+        }
 
         return $this->redirectToRoute('app_pos_login');
     }

@@ -27,7 +27,8 @@ final class RegistrationController extends AbstractController
     {
         $submittedToken = $request->request->get('_csrf_token', '');
         if (!$this->isCsrfTokenValid('registration', $submittedToken)) {
-            throw new ValidationException('Token CSRF inválido.');
+            $this->addFlash('error', 'Token de segurança inválido. Tente novamente.');
+            return $this->redirectToRoute('app_cadastro_user_form');
         }
 
         $data = $request->request->all();
@@ -39,7 +40,12 @@ final class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_cadastro_user_form');
         }
 
-        $this->registrationService->register($tipo, $data);
+        try {
+            $this->registrationService->register($tipo, $data);
+        } catch (\Throwable $e) {
+            $this->addFlash('error', $e->getMessage());
+            return $this->redirectToRoute('app_cadastro_user_form');
+        }
 
         $this->addFlash('success', 'Registro realizado com sucesso! Verifique seu email para ativar sua conta.');
         return $this->redirectToRoute('app_login_form');

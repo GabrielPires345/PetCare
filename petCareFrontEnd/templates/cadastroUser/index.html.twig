@@ -83,7 +83,7 @@
                     <div class="perfil perfil-cliente d-none">
                         <h5>Dados do Cliente</h5>
                         <input type="text" name="nomeCompleto" class="form-control mb-2" placeholder="Nome completo" required>
-                        <input type="text" name="cpf" class="form-control mb-2" placeholder="CPF" required>
+                        <input type="text" name="cpf" class="form-control mb-2" placeholder="CPF" required maxlength="14">
                         <input type="date" name="dataNascimento" class="form-control mb-3" required>
 
                         <h5>Dados do Pet</h5>
@@ -114,7 +114,7 @@
                         <h5>Dados da Clínica</h5>
                         <input type="text" name="nomeClinica" class="form-control mb-2" placeholder="Nome da clínica" required>
                         <input type="text" name="razaoSocial" class="form-control mb-2" placeholder="Razão social" required>
-                        <input type="text" name="cnpj" class="form-control mb-3" placeholder="CNPJ" required>
+                        <input type="text" name="cnpj" class="form-control mb-3" placeholder="CNPJ" required maxlength="18">
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 mt-3">
@@ -129,6 +129,236 @@
 
 {% block javascripts %}
     <script>
+        // === MASCARAS ===
+
+        function maskCPF(input) {
+            input.addEventListener('input', function () {
+                let v = this.value.replace(/\D/g, '').substring(0, 11);
+                if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+                else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+                else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+                this.value = v;
+            });
+        }
+
+        function maskCNPJ(input) {
+            input.addEventListener('input', function () {
+                let v = this.value.replace(/\D/g, '').substring(0, 14);
+                if (v.length > 12) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})/, '$1.$2.$3/$4-$5');
+                else if (v.length > 8) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{1,4})/, '$1.$2.$3/$4');
+                else if (v.length > 5) v = v.replace(/(\d{2})(\d{3})(\d{1,3})/, '$1.$2.$3');
+                else if (v.length > 2) v = v.replace(/(\d{2})(\d{1,3})/, '$1.$2');
+                this.value = v;
+            });
+        }
+
+        function maskPeso(input) {
+            input.addEventListener('input', function () {
+                let v = this.value.replace(/[^\d.]/g, '');
+                // Allow only one decimal point
+                const parts = v.split('.');
+                if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+                // Limit to 1 decimal place and max 999.9
+                if (parts[1] && parts[1].length > 1) v = parts[0] + '.' + parts[1].substring(0, 1);
+                this.value = v;
+            });
+        }
+
+        // Aplicar mascaras
+        const cpfInput = document.querySelector('input[name="cpf"]');
+        if (cpfInput) maskCPF(cpfInput);
+
+        const cnpjInput = document.querySelector('input[name="cnpj"]');
+        if (cnpjInput) maskCNPJ(cnpjInput);
+
+        const petPesoInput = document.querySelector('input[name="pet[peso]"]');
+        if (petPesoInput) maskPeso(petPesoInput);
+
+        // === VALIDACAO ===
+
+        function showFieldError(input, message) {
+            clearFieldError(input);
+            input.classList.add('is-invalid');
+            const div = document.createElement('div');
+            div.className = 'invalid-feedback';
+            div.textContent = message;
+            input.parentNode.appendChild(div);
+        }
+
+        function clearFieldError(input) {
+            input.classList.remove('is-invalid');
+            const existing = input.parentNode.querySelector('.invalid-feedback');
+            if (existing) existing.remove();
+        }
+
+        function isValidCPF(cpf) {
+            const digits = cpf.replace(/\D/g, '');
+            if (digits.length !== 11) return false;
+            if (/^(\d)\1{10}$/.test(digits)) return false;
+            let sum = 0;
+            for (let i = 0; i < 9; i++) sum += parseInt(digits[i]) * (10 - i);
+            let rev = 11 - (sum % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(digits[9])) return false;
+            sum = 0;
+            for (let i = 0; i < 10; i++) sum += parseInt(digits[i]) * (11 - i);
+            rev = 11 - (sum % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            return rev === parseInt(digits[10]);
+        }
+
+        function isValidCNPJ(cnpj) {
+            const digits = cnpj.replace(/\D/g, '');
+            if (digits.length !== 14) return false;
+            if (/^(\d)\1{13}$/.test(digits)) return false;
+            let length = digits.length - 2;
+            let nums = digits.substring(0, length);
+            let sum = 0;
+            let pos = length - 7;
+            for (let i = length; i >= 1; i--) {
+                sum += parseInt(nums[length - i]) * pos--;
+                if (pos < 2) pos = 9;
+            }
+            let result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+            if (result !== parseInt(digits[length])) return false;
+            length = digits.length - 1;
+            nums = digits.substring(0, length);
+            sum = 0;
+            pos = length - 7;
+            for (let i = length; i >= 1; i--) {
+                sum += parseInt(nums[length - i]) * pos--;
+                if (pos < 2) pos = 9;
+            }
+            result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+            return result === parseInt(digits[length]);
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        const form = document.querySelector('.cadastro-page__form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                let hasError = false;
+
+                // Clear all previous errors
+                form.querySelectorAll('.is-invalid').forEach(el => clearFieldError(el));
+
+                // Nome usuario
+                const nomeUsuario = form.querySelector('input[name="nomeUsuario"]');
+                if (nomeUsuario && nomeUsuario.value.trim().length < 3) {
+                    showFieldError(nomeUsuario, 'Nome de usuario deve ter pelo menos 3 caracteres.');
+                    hasError = true;
+                }
+
+                // Email
+                const email = form.querySelector('input[name="email"]');
+                if (email && !isValidEmail(email.value.trim())) {
+                    showFieldError(email, 'Informe um email valido.');
+                    hasError = true;
+                }
+
+                // Senha
+                const senha = form.querySelector('input[name="senha"]');
+                if (senha && senha.value.length < 6) {
+                    showFieldError(senha, 'A senha deve ter pelo menos 6 caracteres.');
+                    hasError = true;
+                }
+
+                // Confirmar senha
+                const confirma = form.querySelector('input[name="confirmaSenha"]');
+                if (confirma && senha && confirma.value !== senha.value) {
+                    showFieldError(confirma, 'As senhas nao conferem.');
+                    hasError = true;
+                }
+
+                // Tipo de conta
+                const nivel = form.querySelector('#nivelAcesso');
+                if (nivel && !nivel.value) {
+                    showFieldError(nivel, 'Selecione o tipo de conta.');
+                    hasError = true;
+                }
+
+                // Validação especifica por tipo
+                if (nivel && nivel.value === 'CLIENTE') {
+                    const cpf = form.querySelector('input[name="cpf"]');
+                    if (cpf && !isValidCPF(cpf.value)) {
+                        showFieldError(cpf, 'CPF invalido. Use o formato 000.000.000-00.');
+                        hasError = true;
+                    }
+
+                    const nomeCompleto = form.querySelector('input[name="nomeCompleto"]');
+                    if (nomeCompleto && nomeCompleto.value.trim().length < 3) {
+                        showFieldError(nomeCompleto, 'Informe o nome completo.');
+                        hasError = true;
+                    }
+
+                    const dataNasc = form.querySelector('input[name="dataNascimento"]');
+                    if (dataNasc && !dataNasc.value) {
+                        showFieldError(dataNasc, 'Informe a data de nascimento.');
+                        hasError = true;
+                    }
+                }
+
+                if (nivel && nivel.value === 'VETERINARIO') {
+                    const nome = form.querySelector('.perfil-veterinario input[name="nome"]');
+                    if (nome && nome.value.trim().length < 3) {
+                        showFieldError(nome, 'Informe o nome.');
+                        hasError = true;
+                    }
+
+                    const crmv = form.querySelector('input[name="crmv"]');
+                    if (crmv && crmv.value.trim().length < 4) {
+                        showFieldError(crmv, 'Informe um CRMV valido.');
+                        hasError = true;
+                    }
+                }
+
+                if (nivel && nivel.value === 'CLINICA') {
+                    const nomeClinica = form.querySelector('input[name="nomeClinica"]');
+                    if (nomeClinica && nomeClinica.value.trim().length < 3) {
+                        showFieldError(nomeClinica, 'Informe o nome da clinica.');
+                        hasError = true;
+                    }
+
+                    const razaoSocial = form.querySelector('input[name="razaoSocial"]');
+                    if (razaoSocial && razaoSocial.value.trim().length < 3) {
+                        showFieldError(razaoSocial, 'Informe a razao social.');
+                        hasError = true;
+                    }
+
+                    const cnpj = form.querySelector('input[name="cnpj"]');
+                    if (cnpj && !isValidCNPJ(cnpj.value)) {
+                        showFieldError(cnpj, 'CNPJ invalido. Use o formato 00.000.000/0000-00.');
+                        hasError = true;
+                    }
+                }
+
+                if (hasError) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    const firstError = form.querySelector('.is-invalid');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
+                }
+            });
+
+            // Limpar erro ao digitar
+            form.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('input', function () {
+                    clearFieldError(this);
+                });
+                el.addEventListener('change', function () {
+                    clearFieldError(this);
+                });
+            });
+        }
+
+        // === TOGGLE PERFIL ===
+
         const select = document.getElementById('nivelAcesso');
 
         if (select) {
@@ -141,8 +371,6 @@
                 if (this.value === 'CLIENTE') {
                     const section = document.querySelector('.perfil-cliente');
                     section?.classList.remove('d-none');
-                    section?.querySelectorAll('[data-cliente-required]').forEach(el => el.setAttribute('required', ''));
-                    // Add required back to cliente fields
                     section?.querySelectorAll('input[name="nomeCompleto"], input[name="cpf"], input[name="dataNascimento"]').forEach(el => el.setAttribute('required', ''));
                 }
 
