@@ -1,0 +1,75 @@
+{% extends 'components/base.html.twig' %}
+
+{% block title %}PetCare – Login{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/login/login.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid p-0 login-page">
+        <div class="row g-0 min-vh-100">
+
+            <!-- BANNER (ESQUERDA) -->
+            <div class="col-md-5 d-none d-md-flex align-items-center justify-content-center login-page__banner">
+                <div class="text-center px-4">
+                    <h3 class="login-page__banner-title">
+                        "É cuidar do bem estar <br> do seu pet"
+                    </h3>
+                </div>
+            </div>
+
+            <!-- FORM (DIREITA) -->
+            <div class="col-12 col-md-7 d-flex align-items-center justify-content-center login-page__content">
+
+                <form method="POST" action="{{ path('app_login') }}" class="login-page__form bg-white p-4 rounded shadow-sm w-100">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <h2 class="text-center mb-4 login-page__title">Entrar</h2>
+
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endfor %}
+
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success">{{ message }}</div>
+                    {% endfor %}
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-control"
+                            required
+                        >
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="senha" class="form-label">Senha</label>
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            class="form-control"
+                            required
+                            minlength="2"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 login-page__button">
+                        Entrar
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <a href="{{ path('app_cadastro_user_form') }}" class="login-page__link text-decoration-none">
+                            Ainda não tem conta?
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

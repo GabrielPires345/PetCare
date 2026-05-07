@@ -1,0 +1,34 @@
+{% extends 'components/base.html.twig' %}
+
+{% block title %}PetCare – Cuidado completo para seu Pet{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/home/home.css') }}">
+{% endblock %}
+
+{% block body %}
+    <main class="home-page">
+        <section class="home-page__hero py-5">
+            <div class="container-fluid px-4 px-lg-5">
+                <div class="home-page__content">
+
+                    <div class="home-page__badge d-inline-flex align-items-center mb-3">
+                        <span class="home-page__dot"></span>
+                        <span class="ms-2">Plataforma completa para tutores</span>
+                    </div>
+
+                    <h1 class="home-page__title fw-bold mb-4">
+                        Tudo que seu pet precisa,<br>
+                        na palma da <span class="home-page__accent">sua mão.</span>
+                    </h1>
+
+                    <p class="home-page__description">
+                        Saúde, socialização e mercado em um único ecossistema.
+                        Controle vacinas, consultas e gastos — de forma inteligente e simples.
+                    </p>
+
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}

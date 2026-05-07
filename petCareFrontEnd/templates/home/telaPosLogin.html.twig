@@ -1,0 +1,62 @@
+{% extends 'components/base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/home/dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="dashboard-page">
+
+        <!-- SIDEBAR -->
+        <aside class="dashboard-page__sidebar">
+            <div class="dashboard-page__sidebar-header">
+                <div class="dashboard-page__logo">App</div>
+            </div>
+
+            <ul class="dashboard-page__menu">
+                <li class="dashboard-page__item active">Dashboard</li>
+                <li class="dashboard-page__item">Agendamento</li>
+                <li class="dashboard-page__item">Pets</li>
+                <li class="dashboard-page__item">Chat</li>
+                <li class="dashboard-page__item">Perfil</li>
+                <li class="dashboard-page__item">Configurações</li>
+            </ul>
+
+            <div class="dashboard-page__footer">
+                <div class="dashboard-page__user">
+                    <div class="dashboard-page__avatar">{{ user_name()|first|upper }}</div>
+                    <div>
+                        <span>{{ user_name() }}</span>
+                        <small>{{ user_tipo() }}</small>
+                    </div>
+                </div>
+
+                <a href="{{ path('app_logout') }}" class="btn btn-danger w-100">Sair</a>
+            </div>
+        </aside>
+
+        <!-- CONTEÚDO -->
+        <main class="dashboard-page__content">
+
+            <!-- TOPBAR -->
+            <header class="dashboard-page__topbar">
+                <h1>Dashboard</h1>
+            </header>
+
+            <!-- CONTEÚDO -->
+            <section class="dashboard-page__section">
+
+                <div class="dashboard-page__stats">
+                    <div class="dashboard-page__card">Acessos: </div>
+                    <div class="dashboard-page__card">Receita: R$ 8.450</div>
+                    <div class="dashboard-page__card">Usuários: 367</div>
+
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+{% endblock %}

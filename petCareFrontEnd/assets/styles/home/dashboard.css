@@ -1,0 +1,57 @@
+.dashboard-page {
+    display: flex;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+/* SIDEBAR */
+.dashboard-page__sidebar {
+    width: 240px;
+    background: #1A2A35;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.dashboard-page__menu {
+    list-style: none;
+    padding: 0;
+}
+
+.dashboard-page__item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dashboard-page__item:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* CONTENT */
+.dashboard-page__content {
+    flex: 1;
+    background: #F5F6FA;
+}
+
+/* TOPBAR */
+.dashboard-page__topbar {
+    background: white;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* STATS */
+.dashboard-page__stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 20px;
+}
+
+.dashboard-page__card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+}
