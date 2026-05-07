@@ -1,0 +1,121 @@
+{% extends "components/base.html.twig" %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block body %}
+<div class="d-flex" style="min-height: 100vh;">
+
+    <!-- Sidebar -->
+    <nav class="bg-dark text-white p-3" style="width: 250px; flex-shrink: 0;">
+        <div class="mb-4">
+            <h5 class="text-uppercase text-muted small">Menu</h5>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_pos_login') }}">
+                    <i class="bi bi-house-door me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_pets') }}">
+                    <i class="bi bi-heart me-2"></i>Meus Pets
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_agendamentos') }}">
+                    <i class="bi bi-calendar me-2"></i>Agendamentos
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white active" href="{{ path('app_perfil') }}">
+                    <i class="bi bi-person me-2"></i>Perfil
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <form method="post" action="{{ path('app_logout') }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                    <button type="submit" class="nav-link text-danger btn btn-link text-start w-100 p-0">
+                        <i class="bi bi-box-arrow-left me-2"></i>Sair
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Conteudo -->
+    <div class="flex-grow-1 p-4 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Meu Perfil</h2>
+            <a href="{{ path('app_perfil_editar') }}" class="btn btn-primary">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+        </div>
+
+        {% for msg in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for msg in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        <div class="row g-4">
+            <!-- Dados da Conta -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Dados da Conta</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong>Nome de Usuário:</strong> {{ user.nomeUsuario ?? '-' }}</p>
+                        <p class="mb-2"><strong>Email:</strong> {{ user.email ?? '-' }}</p>
+                        <p class="mb-0"><strong>Tipo:</strong>
+                            {% if tipoPerfil == 'CLIENTE' %}
+                                <span class="badge bg-primary">Cliente</span>
+                            {% elseif tipoPerfil == 'CLINICA' %}
+                                <span class="badge bg-info">Clínica</span>
+                            {% elseif tipoPerfil == 'VETERINARIO' %}
+                                <span class="badge bg-warning text-dark">Veterinário</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ tipoPerfil }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados do Perfil -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Dados do Perfil</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if perfil is not null %}
+                            {% if tipoPerfil == 'CLIENTE' %}
+                                <p class="mb-2"><strong>Nome Completo:</strong> {{ perfil.nomeCompleto ?? '-' }}</p>
+                                <p class="mb-2"><strong>CPF:</strong> {{ perfil.cpf ?? '-' }}</p>
+                                <p class="mb-0"><strong>Data de Nascimento:</strong> {{ perfil.dataNascimento ?? '-' }}</p>
+                            {% elseif tipoPerfil == 'CLINICA' %}
+                                <p class="mb-2"><strong>Nome da Clínica:</strong> {{ perfil.nomeClinica ?? '-' }}</p>
+                                <p class="mb-2"><strong>Razão Social:</strong> {{ perfil.razaoSocial ?? '-' }}</p>
+                                <p class="mb-0"><strong>CNPJ:</strong> {{ perfil.cnpj ?? '-' }}</p>
+                            {% elseif tipoPerfil == 'VETERINARIO' %}
+                                <p class="mb-2"><strong>Nome:</strong> {{ perfil.nome ?? '-' }}</p>
+                                <p class="mb-0"><strong>CRMV:</strong> {{ perfil.crmv ?? '-' }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted mb-0">Não foi possível carregar os dados do perfil.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

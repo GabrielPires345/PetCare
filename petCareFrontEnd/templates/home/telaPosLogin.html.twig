@@ -1,62 +1,197 @@
-{% extends 'components/base.html.twig' %}
+{% extends "components/base.html.twig" %}
 
 {% block title %}Dashboard{% endblock %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('styles/home/dashboard.css') }}">
-{% endblock %}
-
 {% block body %}
-    <div class="dashboard-page">
+<div class="d-flex" style="min-height: 100vh;">
 
-        <!-- SIDEBAR -->
-        <aside class="dashboard-page__sidebar">
-            <div class="dashboard-page__sidebar-header">
-                <div class="dashboard-page__logo">App</div>
+    <!-- Sidebar -->
+    <nav class="bg-dark text-white p-3" style="width: 250px; flex-shrink: 0;">
+        <div class="mb-4">
+            <h5 class="text-uppercase text-muted small">Menu</h5>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_pos_login') }}">
+                    <i class="bi bi-house-door me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_pets') }}">
+                    <i class="bi bi-heart me-2"></i>Meus Pets
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_agendamentos') }}">
+                    <i class="bi bi-calendar me-2"></i>Agendamentos
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_perfil') }}">
+                    <i class="bi bi-person me-2"></i>Perfil
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <form method="post" action="{{ path('app_logout') }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                    <button type="submit" class="nav-link text-danger btn btn-link text-start w-100 p-0">
+                        <i class="bi bi-box-arrow-left me-2"></i>Sair
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Conteudo Principal -->
+    <div class="flex-grow-1 p-4 bg-light">
+
+        <!-- Boas-vindas -->
+        <div class="mb-4">
+            <h2>Bem-vindo, {{ user_name() }}!</h2>
+            <p class="text-muted">
+                {% if user_tipo() == 'CLIENTE' %}
+                    Dono(a) de pet
+                {% elseif user_tipo() == 'VETERINARIO' %}
+                    Veterinário(a)
+                {% elseif user_tipo() == 'CLINICA' %}
+                    Clínica
+                {% else %}
+                    Usuário
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Flash messages -->
+        {% for msg in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
+        {% endfor %}
 
-            <ul class="dashboard-page__menu">
-                <li class="dashboard-page__item active">Dashboard</li>
-                <li class="dashboard-page__item">Agendamento</li>
-                <li class="dashboard-page__item">Pets</li>
-                <li class="dashboard-page__item">Chat</li>
-                <li class="dashboard-page__item">Perfil</li>
-                <li class="dashboard-page__item">Configurações</li>
-            </ul>
-
-            <div class="dashboard-page__footer">
-                <div class="dashboard-page__user">
-                    <div class="dashboard-page__avatar">{{ user_name()|first|upper }}</div>
-                    <div>
-                        <span>{{ user_name() }}</span>
-                        <small>{{ user_tipo() }}</small>
+        <!-- Cards de Resumo -->
+        {% if user_tipo() == 'CLIENTE' %}
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h3 class="text-primary">{{ totalPets }}</h3>
+                        <p class="text-muted mb-0">Pet{{ totalPets != 1 ? 's' : '' }} cadastrado{{ totalPets != 1 ? 's' : '' }}</p>
                     </div>
                 </div>
-
-                <a href="{{ path('app_logout') }}" class="btn btn-danger w-100">Sair</a>
             </div>
-        </aside>
-
-        <!-- CONTEÚDO -->
-        <main class="dashboard-page__content">
-
-            <!-- TOPBAR -->
-            <header class="dashboard-page__topbar">
-                <h1>Dashboard</h1>
-            </header>
-
-            <!-- CONTEÚDO -->
-            <section class="dashboard-page__section">
-
-                <div class="dashboard-page__stats">
-                    <div class="dashboard-page__card">Acessos: </div>
-                    <div class="dashboard-page__card">Receita: R$ 8.450</div>
-                    <div class="dashboard-page__card">Usuários: 367</div>
-
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h3 class="text-success">{{ totalAgendamentos }}</h3>
+                        <p class="text-muted mb-0">Agendamento{{ totalAgendamentos != 1 ? 's' : '' }}</p>
+                    </div>
                 </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <a href="{{ path('app_agendamento_novo') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i> Novo Agendamento
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            </section>
+        <!-- Pets recentes -->
+        {% if pets is not empty %}
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Meus Pets</h5>
+                <a href="{{ path('app_pets') }}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for pet in pets %}
+                    <div class="col-md-4">
+                        <div class="card border">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ pet.nome }}</h6>
+                                <p class="card-text text-muted small mb-1">{{ pet.especie }} &middot; {{ pet.sexo }}</p>
+                                {% if pet.dataNascimento is defined and pet.dataNascimento %}
+                                    <p class="card-text text-muted small mb-0">{{ pet.dataNascimento }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body text-center py-5">
+                <p class="text-muted mb-3">Você ainda não cadastrou nenhum pet.</p>
+                <a href="{{ path('app_pet_novo') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Cadastrar Pet
+                </a>
+            </div>
+        </div>
+        {% endif %}
 
-        </main>
+        <!-- Agendamentos recentes -->
+        {% if agendamentos is not empty %}
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Agendamentos</h5>
+                <a href="{{ path('app_agendamentos') }}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Pet</th>
+                            <th>Clínica</th>
+                            <th>Serviço</th>
+                            <th>Data/Hora</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ag in agendamentos|slice(0, 5) %}
+                        <tr>
+                            <td>{{ ag.petNome ?? '-' }}</td>
+                            <td>{{ ag.clinicaNome ?? '-' }}</td>
+                            <td>{{ ag.servicoNome ?? '-' }}</td>
+                            <td>{{ ag.dataHora ?? '-' }}</td>
+                            <td>
+                                {% set status = ag.status ?? '' %}
+                                {% if status == 'CONFIRMADO' %}
+                                    <span class="badge bg-success">Confirmado</span>
+                                {% elseif status == 'PENDENTE' %}
+                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                {% elseif status == 'CANCELADO' %}
+                                    <span class="badge bg-danger">Cancelado</span>
+                                {% elseif status == 'CONCLUIDO' %}
+                                    <span class="badge bg-secondary">Concluído</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">{{ status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Dashboard para Veterinario / Clinica -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <h5 class="text-muted">Dashboard em construção para este tipo de perfil.</h5>
+                <p class="text-muted">Em breve funcionalidades específicas para {{ user_tipo() == 'VETERINARIO' ? 'veterinários' : 'clínicas' }}.</p>
+            </div>
+        </div>
+        {% endif %}
+
     </div>
+</div>
 {% endblock %}

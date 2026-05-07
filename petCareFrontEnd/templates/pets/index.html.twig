@@ -1,0 +1,120 @@
+{% extends "components/base.html.twig" %}
+
+{% block title %}Meus Pets{% endblock %}
+
+{% block body %}
+<div class="d-flex" style="min-height: 100vh;">
+
+    <!-- Sidebar -->
+    <nav class="bg-dark text-white p-3" style="width: 250px; flex-shrink: 0;">
+        <div class="mb-4">
+            <h5 class="text-uppercase text-muted small">Menu</h5>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_pos_login') }}">
+                    <i class="bi bi-house-door me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white active" href="{{ path('app_pets') }}">
+                    <i class="bi bi-heart me-2"></i>Meus Pets
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_agendamentos') }}">
+                    <i class="bi bi-calendar me-2"></i>Agendamentos
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="{{ path('app_perfil') }}">
+                    <i class="bi bi-person me-2"></i>Perfil
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <form method="post" action="{{ path('app_logout') }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                    <button type="submit" class="nav-link text-danger btn btn-link text-start w-100 p-0">
+                        <i class="bi bi-box-arrow-left me-2"></i>Sair
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Conteudo -->
+    <div class="flex-grow-1 p-4 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Meus Pets</h2>
+            <a href="{{ path('app_pet_novo') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Novo Pet
+            </a>
+        </div>
+
+        <!-- Flash messages -->
+        {% for msg in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for msg in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        {% if pets is empty %}
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <p class="text-muted mb-3">Você ainda não cadastrou nenhum pet.</p>
+                    <a href="{{ path('app_pet_novo') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Cadastrar primeiro pet
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="row g-4">
+                {% for pet in pets %}
+                    <div class="col-md-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ pet.nome }}</h5>
+                                <hr>
+                                <p class="mb-1"><strong>Espécie:</strong> {{ pet.especie }}</p>
+                                <p class="mb-1"><strong>Sexo:</strong> {{ pet.sexo }}</p>
+                                {% if pet.peso is defined and pet.peso %}
+                                    <p class="mb-1"><strong>Peso:</strong> {{ pet.peso }} kg</p>
+                                {% endif %}
+                                {% if pet.dataNascimento is defined and pet.dataNascimento %}
+                                    <p class="mb-1"><strong>Nascimento:</strong> {{ pet.dataNascimento }}</p>
+                                {% endif %}
+                                {% if pet.castrado is defined %}
+                                    <p class="mb-0">
+                                        <strong>Castrado:</strong>
+                                        {% if pet.castrado %}
+                                            <span class="badge bg-success">Sim</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Não</span>
+                                        {% endif %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <form method="post" action="{{ path('app_pet_remover', {petId: pet.id}) }}"
+                                      onsubmit="return confirm('Tem certeza que deseja remover {{ pet.nome }}?')">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('pet_remove') }}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash me-1"></i> Remover
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
