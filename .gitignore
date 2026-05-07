@@ -1,0 +1,22 @@
+# IDE
+.idea/
+
+# OpenClaude
+.openclaude/
+
+# Docker export
+petcare-docker-export/
+
+# Backend
+Backend/target/
+Backend/.mvn/
+Backend/*.jar
+
+# Frontend
+petCareFrontEnd/vendor/
+petCareFrontEnd/var/
+petCareFrontEnd/node_modules/
+
+# OS
+Thumbs.db
+.DS_Store
