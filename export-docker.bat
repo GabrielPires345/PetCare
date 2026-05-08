@@ -11,25 +11,17 @@ set EXPORT_DIR=petcare-docker-export
 if exist %EXPORT_DIR% rmdir /s /q %EXPORT_DIR%
 mkdir %EXPORT_DIR%
 
-REM Buildar as imagens do backend e frontend
-echo [1/8] Construindo imagem do backend...
-docker build -t petcare-backend:latest ./Backend
+REM Buildar as imagens usando docker compose (respeita Dockerfiles otimizados)
+echo [1/8] Construindo imagens com docker compose...
+docker compose build
 if %errorlevel% neq 0 (
-    echo ERRO: Falha ao construir a imagem do backend.
-    pause
-    exit /b 1
-)
-
-echo [2/8] Construindo imagem do frontend...
-docker build -t petcare-frontend:latest ./petCareFrontEnd
-if %errorlevel% neq 0 (
-    echo ERRO: Falha ao construir a imagem do frontend.
+    echo ERRO: Falha ao construir as imagens.
     pause
     exit /b 1
 )
 
 REM Exportar imagens customizadas
-echo [3/8] Exportando imagem do backend...
+echo [2/8] Exportando imagem do backend...
 docker save -o %EXPORT_DIR%\petcare-backend.tar petcare-backend:latest
 if %errorlevel% neq 0 (
     echo ERRO: Falha ao exportar imagem do backend.
@@ -37,7 +29,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo [4/8] Exportando imagem do frontend...
+echo [3/8] Exportando imagem do frontend...
 docker save -o %EXPORT_DIR%\petcare-frontend.tar petcare-frontend:latest
 if %errorlevel% neq 0 (
     echo ERRO: Falha ao exportar imagem do frontend.
@@ -46,7 +38,7 @@ if %errorlevel% neq 0 (
 )
 
 REM Baixar e exportar imagens de infraestrutura
-echo [5/8] Baixando e exportando imagem do PostgreSQL...
+echo [4/8] Baixando e exportando imagem do PostgreSQL...
 docker pull postgres:16
 docker save -o %EXPORT_DIR%\postgres.tar postgres:16
 if %errorlevel% neq 0 (
@@ -55,7 +47,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo [6/8] Baixando e exportando imagem do pgAdmin...
+echo [5/8] Baixando e exportando imagem do pgAdmin...
 docker pull dpage/pgadmin4:8.6
 docker save -o %EXPORT_DIR%\pgadmin.tar dpage/pgadmin4:8.6
 if %errorlevel% neq 0 (
@@ -64,7 +56,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo [7/8] Baixando e exportando imagem do MailHog...
+echo [6/8] Baixando e exportando imagem do MailHog...
 docker pull mailhog/mailhog
 docker save -o %EXPORT_DIR%\mailhog.tar mailhog/mailhog
 if %errorlevel% neq 0 (
@@ -74,7 +66,7 @@ if %errorlevel% neq 0 (
 )
 
 REM Gerar docker-compose.yml de producao (imagens pre-built) e script de importacao
-echo [8/8] Gerando arquivos de configuracao...
+echo [7/8] Gerando arquivos de configuracao...
 
 (
 echo services:
@@ -127,7 +119,12 @@ echo     ports:
 echo       - "8080:8080"
 echo     environment:
 echo       SPRING_PROFILES_ACTIVE: docker
-echo       APP_BASE_URL: http://localhost:8080
+echo       APP_BASE_URL: http://localhost:8000
+echo       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/petcare
+echo       SPRING_DATASOURCE_USERNAME: postgres
+echo       SPRING_DATASOURCE_PASSWORD: postgres
+echo       SPRING_MAIL_HOST: mailhog
+echo       SPRING_MAIL_PORT: 1025
 echo     depends_on:
 echo       postgres:
 echo         condition: service_healthy
@@ -227,7 +224,9 @@ echo echo Logs frontend: docker compose logs -f frontend
 echo pause
 ) > %EXPORT_DIR%\import-docker.bat
 
+echo [8/8] Calculando tamanho total...
 echo.
+
 echo ============================================
 echo   Exportacao concluida!
 echo ============================================
